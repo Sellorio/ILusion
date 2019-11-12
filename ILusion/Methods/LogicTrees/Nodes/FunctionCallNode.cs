@@ -10,9 +10,9 @@ namespace ILusion.Methods.LogicTrees.Nodes
         public ValueNode[] ParameterNodes { get; }
         public bool IsBaseCall { get; }
 
-        internal override Instruction ToInstruction()
+        internal override Instruction[] ToInstructions()
         {
-            return Instruction.Create(ThisNode == null || IsBaseCall ? OpCodes.Call : OpCodes.Callvirt, Method);
+            return new[] { Instruction.Create(ThisNode == null || IsBaseCall ? OpCodes.Call : OpCodes.Callvirt, Method) };
         }
 
         internal override TypeReference GetValueType()

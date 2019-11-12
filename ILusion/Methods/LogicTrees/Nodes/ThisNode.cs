@@ -2,11 +2,11 @@
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
-    public sealed class NoOperationNode : LogicNode
+    public sealed class ThisNode : ValueNode
     {
         internal override Instruction[] ToInstructions()
         {
-            return new[] { Instruction.Create(OpCodes.Nop) };
+            return new[] { Instruction.Create(OpCodes.Ldarg_0) };
         }
     }
 }

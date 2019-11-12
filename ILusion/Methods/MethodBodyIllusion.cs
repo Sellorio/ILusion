@@ -7,6 +7,7 @@ namespace ILusion.Methods
     {
         public static MethodBodyIllusion FromMethodDefinition(MethodDefinition methodDefinition)
         {
+            throw new System.NotImplementedException();
         }
     }
 }

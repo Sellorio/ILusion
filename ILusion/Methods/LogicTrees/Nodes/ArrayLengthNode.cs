@@ -3,11 +3,13 @@ using Mono.Cecil.Cil;
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
-    public sealed class LoadArrayLengthNode : ValueNode
+    public sealed class ArrayLengthNode : ValueNode
     {
-        internal override Instruction ToInstruction()
+        public ValueNode Array { get; }
+
+        internal override Instruction[] ToInstructions()
         {
-            return Instruction.Create(OpCodes.Ldlen);
+            return new[] { Instruction.Create(OpCodes.Ldlen) };
         }
 
         internal override TypeReference GetValueType()

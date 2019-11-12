@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using Mono.Cecil.Cil;
+﻿using Mono.Cecil.Cil;
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
-    public sealed class SetVariableNode : LogicNode
+    public sealed class VariableAssignmentNode : LogicNode
     {
         public VariableDefinition Variable { get; }
         public LogicNode Value { get; }
 
-        internal override Instruction ToInstruction()
+        internal override Instruction[] ToInstructions()
         {
             OpCode opCode;
             var specifyIndex = false;
@@ -34,7 +32,7 @@ namespace ILusion.Methods.LogicTrees.Nodes
                     break;
             }
 
-            return specifyIndex ? Instruction.Create(opCode, Variable.Index) : Instruction.Create(opCode);
+            return new[] { specifyIndex ? Instruction.Create(opCode, Variable.Index) : Instruction.Create(opCode) };
         }
     }
 }
