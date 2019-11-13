@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using ILusion.Methods.LogicTrees.Nodes;
+using Mono.Cecil;
+using Mono.Cecil.Cil;
+
+namespace ILusion.Methods.LogicTrees.Parsers
+{
+    internal class NoOperationParser : IParser
+    {
+        public OpCode[] CanTryParse { get; } =
+        {
+            OpCodes.Nop
+        };
+
+        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        {
+            node = new NoOperationNode();
+            consumedInstructions = 1;
+            return true;
+        }
+    }
+}

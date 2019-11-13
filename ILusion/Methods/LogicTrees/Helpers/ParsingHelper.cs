@@ -8,6 +8,12 @@ namespace ILusion.Methods.LogicTrees.Helpers
     {
         internal static ValueNode[] GetValueNodes(Stack<LogicNode> nodeStack, int count, out LogicNode[] nodes)
         {
+            if (count == 0)
+            {
+                nodes = new LogicNode[0];
+                return new ValueNode[0];
+            }
+
             var gatheredNodes = new List<LogicNode>();
             var valueNodeCount = 0;
 

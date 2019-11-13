@@ -13,6 +13,9 @@ namespace ILusion.Methods.LogicTrees
             Children = ImmutableArray.CreateRange(children ?? new LogicNode[0]);
         }
 
-        internal abstract Instruction[] ToInstructions();
+        internal virtual Instruction[] ToInstructions()
+        {
+            throw new System.NotSupportedException("This method is being phased out in favour of Emitters.");
+        }
     }
 }

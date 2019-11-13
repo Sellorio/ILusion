@@ -29,7 +29,7 @@ namespace ILusion.Methods.LogicTrees.Nodes
     {
         private static readonly MethodInfo _createInstanceMethod = typeof(Activator).GetMethod(nameof(Activator.CreateInstance), new Type[0]);
 
-        internal VariableDefinition GeneratedVariable { get; }
+        internal VariableDefinition GeneratedVariable { get; set; }
         internal bool RequiresGeneratedVariable { get; }
 
         /// <summary>
