@@ -3,9 +3,9 @@ using Mono.Cecil.Cil;
 
 namespace ILusion.Methods.LogicTrees.Emitters
 {
-    internal class ActionCallEmitter : EmitterBase<ActionCallNode>
+    internal class PropertyEmitter : EmitterBase<PropertyNode>
     {
-        protected override void Emit(EmitterContext<ActionCallNode> emitterContext)
+        protected override void Emit(EmitterContext<PropertyNode> emitterContext)
         {
             if (emitterContext.Node.ConstrainedModifier != null)
             {
@@ -15,8 +15,8 @@ namespace ILusion.Methods.LogicTrees.Emitters
             emitterContext.Emit(
                 emitterContext.Node.Instance == null
                     || emitterContext.Node.IsBaseCall
-                    || emitterContext.Node.Method.DeclaringType.IsValueType ? OpCodes.Call : OpCodes.Callvirt,
-                emitterContext.Node.Method);
+                    || emitterContext.Node.Property.DeclaringType.IsValueType ? OpCodes.Call : OpCodes.Callvirt,
+                emitterContext.Node.Property.GetMethod);
         }
     }
 }

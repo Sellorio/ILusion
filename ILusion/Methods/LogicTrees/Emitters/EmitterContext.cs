@@ -9,6 +9,12 @@ namespace ILusion.Methods.LogicTrees.Emitters
         public MethodDefinition Target { get; }
         public TNode Node { get; }
 
+        internal EmitterContext(MethodDefinition target, TNode node)
+        {
+            Target = target;
+            Node = node;
+        }
+
         public EmitterContext<TNode> Emit(OpCode opCode)
         {
             Target.Body.Instructions.Add(Instruction.Create(opCode));

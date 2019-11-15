@@ -10,7 +10,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
 
         public void Emit(MethodDefinition target, LogicNode node)
         {
-            Emit(target, (TNode)node);
+            Emit(new EmitterContext<TNode>(target, (TNode)node));
         }
 
         protected abstract void Emit(EmitterContext<TNode> emitterContext);

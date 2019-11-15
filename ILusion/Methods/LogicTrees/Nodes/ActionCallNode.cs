@@ -11,14 +11,22 @@ namespace ILusion.Methods.LogicTrees.Nodes
         public ValueNode Instance { get; }
         public IReadOnlyList<ValueNode> Parameters { get; }
         public bool IsBaseCall { get; }
+        public TypeReference ConstrainedModifier { get; }
 
-        internal ActionCallNode(MethodReference method, ValueNode instance, IEnumerable<ValueNode> parameters, bool isBaseCall, IEnumerable<LogicNode> children)
+        internal ActionCallNode(
+            MethodReference method,
+            ValueNode instance,
+            IEnumerable<ValueNode> parameters,
+            bool isBaseCall,
+            TypeReference constrainedModifier,
+            IEnumerable<LogicNode> children)
             : base(children)
         {
             Method = method;
             Instance = instance;
             Parameters = ImmutableArray.CreateRange(parameters);
             IsBaseCall = isBaseCall;
+            ConstrainedModifier = constrainedModifier;
         }
 
         internal override Instruction[] ToInstructions()

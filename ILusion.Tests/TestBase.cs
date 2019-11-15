@@ -1,7 +1,10 @@
 ﻿using ILusion.Methods;
+using ILusion.Methods.LogicTrees;
+using ILusion.Methods.LogicTrees.Nodes;
 using ILusion.Tests.Sample;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -16,7 +19,7 @@ namespace ILusion.Tests
             return _sampleAssembly.MainModule.Types.First(x => x.Name == className).Methods.First(x => x.Name == methodName);
         }
 
-        protected void ValidateEmission(MethodDefinition method, MethodBodyIllusion illusion)
+        protected void EmitAndValidateUnchanged(MethodDefinition method, SyntaxTree illusion)
         {
             var oldInstructions = method.Body.Instructions.ToArray();
             illusion.AppyTo(method);
@@ -29,6 +32,44 @@ namespace ILusion.Tests
                 Assert.Equal(oldInstructions[i].OpCode, newInstructions[i].OpCode);
                 Assert.Equal(oldInstructions[i].Operand, newInstructions[i].Operand);
             }
+        }
+
+        protected void CheckStatements(SyntaxTree syntaxTree, params Action<LogicNode>[] checks)
+        {
+            Assert.Collection(syntaxTree.Statements.Where(x => !(x is NoOperationNode)), checks);
+        }
+
+        protected TNode CheckNode<TNode>(LogicNode node, params Action<LogicNode>[] childrenChecks)
+        {
+            var result = Assert.IsType<TNode>(node);
+            Assert.NotNull(node.Children);
+            Assert.Collection(node.Children.Where(x => !(x is NoOperationNode)), childrenChecks);
+            return result;
+        }
+
+        protected Action<LogicNode> CheckReturn(Action<ValueNode> returnValueCheck = null)
+        {
+            return x =>
+            {
+                var returnNode =
+                    returnValueCheck == null
+                        ? CheckNode<ReturnNode>(x)
+                        : CheckNode<ReturnNode>(x, y => returnValueCheck.Invoke(y as ValueNode));
+
+                if (returnValueCheck == null)
+                {
+                    Assert.Null(returnNode.ReturnValue);
+                }
+                else
+                {
+                    Assert.Same(returnNode.Children.OfType<ValueNode>().First(), returnNode.ReturnValue);
+                }
+            };
+        }
+
+        protected ValueNode NthValueChild(LogicNode node, int index)
+        {
+            return node.Children.OfType<ValueNode>().ElementAt(index);
         }
     }
 }

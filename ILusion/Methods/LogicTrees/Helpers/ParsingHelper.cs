@@ -42,7 +42,7 @@ namespace ILusion.Methods.LogicTrees.Helpers
                 nodeStack.Pop();
             }
 
-            nodes = gatheredNodes.ToArray();
+            nodes = Enumerable.Reverse(gatheredNodes).ToArray();
 
             return gatheredNodes.OfType<ValueNode>().Reverse().ToArray();
         }

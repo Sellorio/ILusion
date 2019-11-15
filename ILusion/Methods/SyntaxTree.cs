@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace ILusion.Methods
 {
-    public sealed class MethodBodyIllusion
+    public sealed class SyntaxTree
     {
         private static readonly IParser[] _parsers =
             typeof(IParser).Assembly.GetTypes()
@@ -34,7 +34,7 @@ namespace ILusion.Methods
 
         public IReadOnlyList<LogicNode> Statements { get; }
 
-        private MethodBodyIllusion(IEnumerable<LogicNode> statements)
+        private SyntaxTree(IEnumerable<LogicNode> statements)
         {
             Statements = ImmutableArray.CreateRange(statements);
         }
@@ -101,7 +101,7 @@ namespace ILusion.Methods
             }
         }
 
-        public static MethodBodyIllusion FromMethodDefinition(MethodDefinition methodDefinition)
+        public static SyntaxTree FromMethodDefinition(MethodDefinition methodDefinition)
         {
             if (methodDefinition.Body == null || methodDefinition.Body.Instructions.Count == 0)
             {
@@ -141,7 +141,7 @@ namespace ILusion.Methods
                 }
             }
 
-            return new MethodBodyIllusion(nodeStack.Reverse());
+            return new SyntaxTree(nodeStack.Reverse());
         }
     }
 }

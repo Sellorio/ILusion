@@ -5,7 +5,6 @@ namespace ILusion.Methods.LogicTrees.Nodes
 {
     public sealed class ParameterNode : LogicNode
     {
-        public bool AsReference { get; }
         public ParameterDefinition Parameter { get; }
 
         internal override Instruction[] ToInstructions()

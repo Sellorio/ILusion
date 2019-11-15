@@ -7,12 +7,12 @@ using Mono.Cecil.Cil;
 
 namespace ILusion.Methods.LogicTrees.Parsers
 {
-    internal class ActionCallParser : IParser
+    internal class PropertyParser : IParser
     {
         public OpCode[] CanTryParse { get; } =
         {
-            OpCodes.Call,
             OpCodes.Callvirt,
+            OpCodes.Call,
             OpCodes.Constrained
         };
 
@@ -28,34 +28,23 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 instruction = instruction.Next;
             }
 
-            var methodReference = instruction?.Operand as MethodReference;
-            var calledMethod = methodReference?.Resolve();
+            var calledMethod = (instruction?.Operand as MethodReference)?.Resolve();
 
-            if (calledMethod == null
-                || calledMethod.IsConstructor
-                || calledMethod.IsGetter
-                || calledMethod.IsSetter
-                || calledMethod.ReturnType.FullName != "System.Void")
+            if (calledMethod == null || !calledMethod.IsGetter)
             {
                 return false;
             }
 
-            var expectedStackValues = calledMethod.IsStatic ? calledMethod.Parameters.Count : calledMethod.Parameters.Count + 1;
+            var expectedStackValues = calledMethod.IsStatic ? 0 : 1;
             var valueNodes = ParsingHelper.GetValueNodes(nodeStack, expectedStackValues, out var nodes);
 
             // Callvirt is used for all instance method calls, not just virtual ones. See here for reason:
             // https://blogs.msdn.microsoft.com/ericgu/2008/07/02/why-does-c-always-use-callvirt/
             var isBaseCall = instruction.OpCode == OpCodes.Call && !calledMethod.IsStatic && !calledMethod.DeclaringType.IsValueType;
-            
-            node =
-                new ActionCallNode(
-                    methodReference,
-                    calledMethod.IsStatic ? null : valueNodes[0],
-                    calledMethod.IsStatic ? valueNodes : valueNodes.Skip(1),
-                    isBaseCall,
-                    constrainedModifier,
-                    nodes);
 
+            var property = calledMethod.DeclaringType.Properties.First(x => x.GetMethod == calledMethod);
+
+            node = new PropertyNode(calledMethod.IsStatic ? null : valueNodes[0], property, isBaseCall, constrainedModifier, nodes);
             consumedInstructions = constrainedModifier != null ? 2 : 1;
 
             return true;
