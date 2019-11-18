@@ -8,6 +8,12 @@ namespace ILusion.Methods.LogicTrees.Emitters
     {
         protected override void Emit(EmitterContext<LiteralNode> emitterContext)
         {
+            if (emitterContext.Node.Value == null)
+            {
+                emitterContext.Emit(OpCodes.Ldnull);
+                return;
+            }
+
             switch (emitterContext.Node.Value)
             {
                 case int intValue:

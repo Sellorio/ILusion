@@ -1,5 +1,5 @@
 ﻿using Mono.Cecil;
-using Mono.Cecil.Cil;
+using System.Collections.Generic;
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
@@ -8,9 +8,11 @@ namespace ILusion.Methods.LogicTrees.Nodes
         public ValueNode Array { get; }
         public ValueNode Index { get; }
 
-        internal override Instruction[] ToInstructions()
+        internal ArrayElementReferenceNode(ValueNode array, ValueNode index, IEnumerable<LogicNode> children)
+            : base(children)
         {
-            return new[] { Instruction.Create(OpCodes.Ldelema, ((ArrayType)Array.GetValueType()).ElementType) };
+            Array = array;
+            Index = index;
         }
 
         internal override TypeReference GetValueType()

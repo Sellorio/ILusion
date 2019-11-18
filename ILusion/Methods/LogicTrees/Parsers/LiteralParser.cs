@@ -25,7 +25,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Ldc_I8,
             OpCodes.Ldc_R4,
             OpCodes.Ldc_R8,
-            OpCodes.Ldstr
+            OpCodes.Ldstr,
+            OpCodes.Ldnull
         };
 
         public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
@@ -71,6 +72,9 @@ namespace ILusion.Methods.LogicTrees.Parsers
                     break;
                 case Code.Ldc_I4_M1:
                     node = new LiteralNode(-1);
+                    break;
+                case Code.Ldnull:
+                    node = new LiteralNode(null);
                     break;
                 default:
                     throw new NotSupportedException("Internal Error: unexpected OpCode in parser.");

@@ -9,6 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("ILusion.Tests")]
 
 namespace ILusion.Methods
 {
@@ -66,39 +69,12 @@ namespace ILusion.Methods
                 EmitInstructions(methodDefinition, child, generatedVariables);
             }
 
-            HandleGeneratedVariables(methodDefinition, node, generatedVariables);
-
             if (!_mappedEmitters.TryGetValue(node.GetType(), out var emitter))
             {
                 throw new EmissionException($"No emitter found that supports {node.GetType().Name}.");
             }
 
             emitter.Emit(methodDefinition, node);
-        }
-
-        private static void HandleGeneratedVariables(
-            MethodDefinition methodDefinition,
-            LogicNode node,
-            Dictionary<TypeReference, VariableDefinition> generatedVariables)
-        {
-            if (node is NewNode newNode)
-            {
-                if (generatedVariables.TryGetValue(newNode.Type, out var generatedVariable))
-                {
-                    newNode.GeneratedVariable = generatedVariable;
-                }
-                else if (newNode.GeneratedVariable != null)
-                {
-                    generatedVariables[newNode.Type] = newNode.GeneratedVariable;
-                }
-                else
-                {
-                    var variable = new VariableDefinition(newNode.Type);
-                    methodDefinition.Body.Variables.Add(variable);
-                    generatedVariables[newNode.Type] = variable;
-                    newNode.GeneratedVariable = variable;
-                }
-            }
         }
 
         public static SyntaxTree FromMethodDefinition(MethodDefinition methodDefinition)

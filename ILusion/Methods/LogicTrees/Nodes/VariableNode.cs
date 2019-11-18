@@ -7,6 +7,11 @@ namespace ILusion.Methods.LogicTrees.Nodes
     {
         public VariableDefinition Variable { get; }
 
+        internal VariableNode(VariableDefinition variable)
+        {
+            Variable = variable;
+        }
+
         internal override Instruction[] ToInstructions()
         {
             OpCode opCode;

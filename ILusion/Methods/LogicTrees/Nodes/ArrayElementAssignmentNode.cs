@@ -1,6 +1,6 @@
-﻿using System;
-using Mono.Cecil;
+﻿using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Collections.Generic;
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
@@ -10,45 +10,12 @@ namespace ILusion.Methods.LogicTrees.Nodes
         public ValueNode Index { get; }
         public ValueNode Value { get; }
 
-        internal override Instruction[] ToInstructions()
+        internal ArrayElementAssignmentNode(ValueNode array, ValueNode index, ValueNode value, IEnumerable<LogicNode> children)
+            : base(children)
         {
-            var elementType = ((ArrayType)Array.GetValueType()).ElementType;
-
-            OpCode opCode;
-
-            if (elementType is GenericParameter)
-            {
-                opCode = OpCodes.Stelem_Any;
-            }
-            else
-            {
-                switch (elementType.FullName)
-                {
-                    case "System.SByte":
-                        opCode = OpCodes.Stelem_I1;
-                        break;
-                    case "System.Int16":
-                        opCode = OpCodes.Stelem_I2;
-                        break;
-                    case "System.Int32":
-                        opCode = OpCodes.Stelem_I4;
-                        break;
-                    case "System.Int64":
-                        opCode = OpCodes.Stelem_I8;
-                        break;
-                    case "System.Single":
-                        opCode = OpCodes.Stelem_R4;
-                        break;
-                    case "System.Double":
-                        opCode = OpCodes.Stelem_R8;
-                        break;
-                    default:
-                        var resolvedElementType = elementType.Resolve();
-                        return new[] { Instruction.Create(resolvedElementType.IsClass ? OpCodes.Stelem_Ref : OpCodes.Stelem_Any, elementType) };
-                }
-            }
-
-            return new[] { Instruction.Create(opCode) };
+            Array = array;
+            Index = index;
+            Value = value;
         }
     }
 }

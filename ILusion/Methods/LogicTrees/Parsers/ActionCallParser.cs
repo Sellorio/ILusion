@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
@@ -35,7 +36,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 || calledMethod.IsConstructor
                 || calledMethod.IsGetter
                 || calledMethod.IsSetter
-                || calledMethod.ReturnType.FullName != "System.Void")
+                || calledMethod.ReturnType.FullName != "System.Void"
+                || calledMethod.DeclaringType.FullName == typeof(Activator).FullName && calledMethod.Name == nameof(Activator.CreateInstance) && calledMethod.HasGenericParameters)
             {
                 return false;
             }

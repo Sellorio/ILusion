@@ -30,7 +30,7 @@ namespace ILusion.Tests
             for (var i = 0; i < oldInstructions.Length; i++)
             {
                 Assert.Equal(oldInstructions[i].OpCode, newInstructions[i].OpCode);
-                Assert.Equal(oldInstructions[i].Operand, newInstructions[i].Operand);
+                Assert.Equal(oldInstructions[i].Operand?.ToString(), newInstructions[i].Operand?.ToString());
             }
         }
 
