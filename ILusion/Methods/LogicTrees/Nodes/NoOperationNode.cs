@@ -1,12 +1,12 @@
-﻿using Mono.Cecil.Cil;
+﻿using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
     public sealed class NoOperationNode : LogicNode
     {
-        internal override Instruction[] ToInstructions()
+        internal NoOperationNode()
+            : base(Enumerable.Empty<LogicNode>())
         {
-            return new[] { Instruction.Create(OpCodes.Nop) };
         }
     }
 }

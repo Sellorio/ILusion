@@ -41,40 +41,40 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 case Code.Ldc_R4:
                 case Code.Ldc_R8:
                 case Code.Ldstr:
-                    node = new LiteralNode(instruction.Operand);
+                    node = new LiteralNode(method.Module.ImportReference(instruction.Operand.GetType()), instruction.Operand);
                     break;
                 case Code.Ldc_I4_0:
-                    node = new LiteralNode(0);
+                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 0);
                     break;
                 case Code.Ldc_I4_1:
-                    node = new LiteralNode(1);
+                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 1);
                     break;
                 case Code.Ldc_I4_2:
-                    node = new LiteralNode(2);
+                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 2);
                     break;
                 case Code.Ldc_I4_3:
-                    node = new LiteralNode(3);
+                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 3);
                     break;
                 case Code.Ldc_I4_4:
-                    node = new LiteralNode(4);
+                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 4);
                     break;
                 case Code.Ldc_I4_5:
-                    node = new LiteralNode(5);
+                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 5);
                     break;
                 case Code.Ldc_I4_6:
-                    node = new LiteralNode(6);
+                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 6);
                     break;
                 case Code.Ldc_I4_7:
-                    node = new LiteralNode(7);
+                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 7);
                     break;
                 case Code.Ldc_I4_8:
-                    node = new LiteralNode(8);
+                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 8);
                     break;
                 case Code.Ldc_I4_M1:
-                    node = new LiteralNode(-1);
+                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), -1);
                     break;
                 case Code.Ldnull:
-                    node = new LiteralNode(null);
+                    node = new LiteralNode(method.Module.ImportReference(typeof(object)), null);
                     break;
                 default:
                     throw new NotSupportedException("Internal Error: unexpected OpCode in parser.");

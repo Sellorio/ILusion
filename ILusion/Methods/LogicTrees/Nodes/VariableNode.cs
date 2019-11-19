@@ -1,5 +1,6 @@
 ﻿using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
@@ -8,6 +9,7 @@ namespace ILusion.Methods.LogicTrees.Nodes
         public VariableDefinition Variable { get; }
 
         internal VariableNode(VariableDefinition variable)
+            : base(Enumerable.Empty<LogicNode>())
         {
             Variable = variable;
         }

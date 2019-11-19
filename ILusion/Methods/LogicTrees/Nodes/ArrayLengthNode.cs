@@ -1,20 +1,25 @@
 ﻿using Mono.Cecil;
-using Mono.Cecil.Cil;
+using System.Collections.Generic;
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
     public sealed class ArrayLengthNode : ValueNode
     {
+        private readonly TypeReference _typeOfInt;
         public ValueNode Array { get; }
+        public bool AsLong { get; }
 
-        internal override Instruction[] ToInstructions()
+        internal ArrayLengthNode(TypeReference typeOfInt, ValueNode array, bool asLong, IEnumerable<LogicNode> children)
+            : base(children)
         {
-            return new[] { Instruction.Create(OpCodes.Ldlen) };
+            _typeOfInt = typeOfInt;
+            Array = array;
+            AsLong = asLong;
         }
 
         internal override TypeReference GetValueType()
         {
-            return Module.ImportReference(typeof(int));
+            return _typeOfInt;
         }
     }
 }

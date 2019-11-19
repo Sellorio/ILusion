@@ -4,11 +4,13 @@ namespace ILusion.Methods.LogicTrees.Nodes
 {
     public sealed class LiteralNode : ValueNode
     {
+        private readonly TypeReference _typeOfValue;
         public object Value { get; }
 
-        internal LiteralNode(object value)
+        internal LiteralNode(TypeReference typeOfValue, object value)
             : base(new LogicNode[0])
         {
+            _typeOfValue = typeOfValue;
             Value = value;
         }
 
@@ -19,7 +21,7 @@ namespace ILusion.Methods.LogicTrees.Nodes
 
         internal override TypeReference GetValueType()
         {
-            return Module.ImportReference(Value.GetType());
+            return _typeOfValue;
         }
     }
 }

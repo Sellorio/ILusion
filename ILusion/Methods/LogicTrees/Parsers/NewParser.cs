@@ -23,7 +23,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
             if (instruction.OpCode == OpCodes.Newarr)
             {
-                node = new NewNode(Enumerable.Empty<ValueNode>(), new ArrayType((TypeReference)instruction.Operand), null, Enumerable.Empty<LogicNode>());
+                var sizeParameter = ParsingHelper.GetValueNodes(nodeStack, 1, out var children);
+                node = new NewNode(sizeParameter, new ArrayType((TypeReference)instruction.Operand), null, children);
             }
             else if (instruction.OpCode == OpCodes.Newobj)
             {

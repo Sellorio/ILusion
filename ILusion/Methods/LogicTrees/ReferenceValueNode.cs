@@ -4,7 +4,7 @@ namespace ILusion.Methods.LogicTrees
 {
     public abstract class ReferenceValueNode : ValueNode
     {
-        internal ReferenceValueNode(IEnumerable<LogicNode> children = null)
+        internal ReferenceValueNode(IEnumerable<LogicNode> children)
             : base(children)
         {
         }

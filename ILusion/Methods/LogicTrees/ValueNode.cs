@@ -5,9 +5,7 @@ namespace ILusion.Methods.LogicTrees
 {
     public abstract class ValueNode : LogicNode
     {
-        protected ModuleDefinition Module { get; }
-
-        internal ValueNode(IEnumerable<LogicNode> children = null)
+        internal ValueNode(IEnumerable<LogicNode> children)
             : base(children)
         {
         }

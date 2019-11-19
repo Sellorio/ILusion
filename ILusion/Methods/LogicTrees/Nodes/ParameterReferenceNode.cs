@@ -1,5 +1,6 @@
 ﻿using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
@@ -8,6 +9,7 @@ namespace ILusion.Methods.LogicTrees.Nodes
         public ParameterDefinition Parameter { get; }
 
         internal ParameterReferenceNode(ParameterDefinition parameter)
+            : base(Enumerable.Empty<LogicNode>())
         {
             Parameter = parameter;
         }

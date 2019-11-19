@@ -8,9 +8,9 @@ namespace ILusion.Methods.LogicTrees
     {
         public IReadOnlyList<LogicNode> Children { get; }
 
-        internal LogicNode(IEnumerable<LogicNode> children = null)
+        internal LogicNode(IEnumerable<LogicNode> children)
         {
-            Children = ImmutableArray.CreateRange(children ?? new LogicNode[0]);
+            Children = ImmutableArray.CreateRange(children);
         }
 
         internal virtual Instruction[] ToInstructions()

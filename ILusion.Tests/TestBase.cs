@@ -4,9 +4,11 @@ using ILusion.Methods.LogicTrees.Nodes;
 using ILusion.Tests.Sample;
 using Mono.Cecil;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+
+// The collection object used by Mono.Cecil is not thread safe and triggers IndexOutOfRangeException at random.
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace ILusion.Tests
 {
@@ -19,10 +21,10 @@ namespace ILusion.Tests
             return _sampleAssembly.MainModule.Types.First(x => x.Name == className).Methods.First(x => x.Name == methodName);
         }
 
-        protected void EmitAndValidateUnchanged(MethodDefinition method, SyntaxTree illusion)
+        protected void EmitAndValidateUnchanged(MethodDefinition method, SyntaxTree syntaxTree)
         {
             var oldInstructions = method.Body.Instructions.ToArray();
-            illusion.AppyTo(method);
+            syntaxTree.AppyTo(method);
             var newInstructions = method.Body.Instructions;
 
             Assert.Equal(oldInstructions.Length, newInstructions.Count);
