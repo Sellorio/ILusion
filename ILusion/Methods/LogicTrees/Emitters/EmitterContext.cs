@@ -1,113 +1,134 @@
-﻿using Mono.Cecil;
+﻿using ILusion.Exceptions;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Collections.Generic;
 
 namespace ILusion.Methods.LogicTrees.Emitters
 {
     internal class EmitterContext<TNode>
         where TNode : LogicNode
     {
+        private readonly Dictionary<Instruction, LogicNode> _instructionToNodeMapping;
+
         public MethodDefinition Target { get; }
         public TNode Node { get; }
 
-        internal EmitterContext(MethodDefinition target, TNode node)
+        internal EmitterContext(Dictionary<Instruction, LogicNode> instructionToNodeMapping, MethodDefinition target, TNode node)
         {
+            _instructionToNodeMapping = instructionToNodeMapping;
             Target = target;
             Node = node;
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode));
-            return this;
+            return Add(Instruction.Create(opCode));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, ParameterDefinition operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, VariableDefinition operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, Instruction[] operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, Instruction operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, double operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, float operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, long operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, byte operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, sbyte operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, string operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, FieldReference operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, MethodReference operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, CallSite operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, TypeReference operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
-            return this;
+            return Add(Instruction.Create(opCode, operand));
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode, int operand)
         {
-            Target.Body.Instructions.Add(Instruction.Create(opCode, operand));
+            return Add(Instruction.Create(opCode, operand));
+        }
+
+        /// <summary>
+        /// Emits a temporary branch instruction. After all instructions for the method have been
+        /// emitted, the links between branches and their targets will be updated using <see cref="BranchNode.Target"/>.
+        /// </summary>
+        /// <param name="opCode">
+        ///     The branch op code to use. Only <see cref="OpCodes.Br"/>, <see cref="OpCodes.Br_S"/>,
+        ///     <see cref="OpCodes.Brfalse"/>, <see cref="OpCodes.Brfalse_S"/>, <see cref="OpCodes.Brtrue"/> and
+        ///     <see cref="OpCodes.Brtrue_S"/> are permitted.
+        /// </param>
+        /// <returns></returns>
+        public EmitterContext<TNode> EmitBranch(OpCode opCode)
+        {
+            if (!typeof(BranchNode).IsAssignableFrom(typeof(TNode)))
+            {
+                throw new EmissionException("Can only emit branch instruction from a BranchNode.");
+            }
+
+            if (Target.Body.Instructions.Count == 0)
+            {
+                throw new EmissionException("A branch cannot be the first instruction in a method.");
+            }
+
+            return Add(Instruction.Create(opCode, Target.Body.Instructions[0]));
+        }
+
+        private EmitterContext<TNode> Add(Instruction instruction)
+        {
+            Target.Body.Instructions.Add(instruction);
+            _instructionToNodeMapping.Add(instruction, Node);
             return this;
         }
     }

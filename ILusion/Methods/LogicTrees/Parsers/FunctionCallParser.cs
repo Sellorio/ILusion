@@ -8,7 +8,7 @@ using Mono.Cecil.Cil;
 
 namespace ILusion.Methods.LogicTrees.Parsers
 {
-    internal class ActionCallParser : IParser
+    internal class FunctionCallParser : IParser
     {
         public OpCode[] CanTryParse { get; } =
         {
@@ -36,7 +36,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 || calledMethod.IsConstructor
                 || calledMethod.IsGetter
                 || calledMethod.IsSetter
-                || calledMethod.ReturnType.FullName != "System.Void")
+                || calledMethod.ReturnType.FullName == "System.Void"
+                || calledMethod.DeclaringType.FullName == typeof(Activator).FullName && calledMethod.Name == nameof(Activator.CreateInstance) && calledMethod.HasGenericParameters)
             {
                 return false;
             }
@@ -49,7 +50,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
             var isBaseCall = instruction.OpCode == OpCodes.Call && !calledMethod.IsStatic && !calledMethod.DeclaringType.IsValueType;
             
             node =
-                new ActionCallNode(
+                new FunctionCallNode(
                     methodReference,
                     calledMethod.IsStatic ? null : valueNodes[0],
                     calledMethod.IsStatic ? valueNodes : valueNodes.Skip(1),

@@ -1,6 +1,7 @@
 ﻿using ILusion.Exceptions;
 using ILusion.Methods.LogicTrees;
 using ILusion.Methods.LogicTrees.Emitters;
+using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using ILusion.Methods.LogicTrees.Parsers;
 using Mono.Cecil;
@@ -49,24 +50,26 @@ namespace ILusion.Methods
                 throw new ParsingException("Method does not support a body.");
             }
 
-            var generatedVariables = new Dictionary<TypeReference, VariableDefinition>();
+            var instructionToNodeMapping = new Dictionary<Instruction, LogicNode>();
 
             methodDefinition.Body.Instructions.Clear();
 
             foreach (var statement in Statements)
             {
-                EmitInstructions(methodDefinition, statement, generatedVariables);
+                EmitInstructions(instructionToNodeMapping, methodDefinition, statement);
             }
+
+            BranchHelper.UpdateBranchInstructions(instructionToNodeMapping, methodDefinition);
         }
 
         private static void EmitInstructions(
+            Dictionary<Instruction, LogicNode> instructionToNodeMapping,
             MethodDefinition methodDefinition,
-            LogicNode node,
-            Dictionary<TypeReference, VariableDefinition> generatedVariables)
+            LogicNode node)
         {
             foreach (var child in node.Children)
             {
-                EmitInstructions(methodDefinition, child, generatedVariables);
+                EmitInstructions(instructionToNodeMapping, methodDefinition, child);
             }
 
             if (!_mappedEmitters.TryGetValue(node.GetType(), out var emitter))
@@ -74,7 +77,7 @@ namespace ILusion.Methods
                 throw new EmissionException($"No emitter found that supports {node.GetType().Name}.");
             }
 
-            emitter.Emit(methodDefinition, node);
+            emitter.Emit(instructionToNodeMapping, methodDefinition, node);
         }
 
         public static SyntaxTree FromMethodDefinition(MethodDefinition methodDefinition)
@@ -84,6 +87,7 @@ namespace ILusion.Methods
                 throw new ParsingException("Method has no body.");
             }
 
+            var instructionToNodeMapping = new Dictionary<Instruction, LogicNode>();
             var nodeStack = new Stack<LogicNode>();
             var instructionIndex = 0;
 
@@ -104,6 +108,7 @@ namespace ILusion.Methods
                     
                     if (successful)
                     {
+                        instructionToNodeMapping.Add(instruction, node);
                         nodeStack.Push(node);
                         instructionParsed = true;
                         instructionIndex += consumedInstructions;
@@ -115,6 +120,16 @@ namespace ILusion.Methods
                 {
                     throw new ParsingException($"Failed to parse instruction ({instruction}).");
                 }
+            }
+
+            foreach (var branch in instructionToNodeMapping.Values.OfType<BranchNode>())
+            {
+                if (!instructionToNodeMapping.TryGetValue(branch.OriginalTarget, out var target))
+                {
+                    throw new ParsingException("Failed to update branch node to point to a parsed node.");
+                }
+
+                branch.Target = target;
             }
 
             return new SyntaxTree(nodeStack.Reverse());

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace ILusion.Methods.LogicTrees.Emitters
 {
@@ -8,9 +10,9 @@ namespace ILusion.Methods.LogicTrees.Emitters
     {
         public Type SupportedNode { get; } = typeof(TNode);
 
-        public void Emit(MethodDefinition target, LogicNode node)
+        public void Emit(Dictionary<Instruction, LogicNode> instructionToNodeMapping, MethodDefinition target, LogicNode node)
         {
-            Emit(new EmitterContext<TNode>(target, (TNode)node));
+            Emit(new EmitterContext<TNode>(instructionToNodeMapping, target, (TNode)node));
         }
 
         protected abstract void Emit(EmitterContext<TNode> emitterContext);

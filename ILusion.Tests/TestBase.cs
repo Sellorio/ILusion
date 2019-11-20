@@ -3,8 +3,10 @@ using ILusion.Methods.LogicTrees;
 using ILusion.Methods.LogicTrees.Nodes;
 using ILusion.Tests.Sample;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Xunit;
 
 // The collection object used by Mono.Cecil is not thread safe and triggers IndexOutOfRangeException at random.
@@ -18,7 +20,7 @@ namespace ILusion.Tests
 
         protected MethodDefinition GetSampleMethod(string className, string methodName)
         {
-            return _sampleAssembly.MainModule.Types.First(x => x.Name == className).Methods.First(x => x.Name == methodName);
+            return _sampleAssembly.MainModule.Types.First(x => Regex.Match(x.Name, "(^[a-zA-Z0-9_]+).*").Groups[1].Value == className).Methods.First(x => x.Name == methodName);
         }
 
         protected void EmitAndValidateUnchanged(MethodDefinition method, SyntaxTree syntaxTree)
@@ -31,8 +33,7 @@ namespace ILusion.Tests
             
             for (var i = 0; i < oldInstructions.Length; i++)
             {
-                Assert.Equal(oldInstructions[i].OpCode, newInstructions[i].OpCode);
-                Assert.Equal(oldInstructions[i].Operand?.ToString(), newInstructions[i].Operand?.ToString());
+                AssertInstructions(oldInstructions[i], newInstructions[i]);
             }
         }
 
@@ -72,6 +73,20 @@ namespace ILusion.Tests
         protected ValueNode NthValueChild(LogicNode node, int index)
         {
             return node.Children.OfType<ValueNode>().ElementAt(index);
+        }
+
+        private static void AssertInstructions(Instruction expected, Instruction actual)
+        {
+            Assert.Equal(expected.OpCode, actual.OpCode);
+
+            if (expected.Operand is Instruction expectedInstruction && actual.Operand is Instruction actualInstruction)
+            {
+                AssertInstructions(expectedInstruction, actualInstruction);
+            }
+            else
+            {
+                Assert.Equal(expected.Operand?.ToString(), actual.Operand?.ToString());
+            }
         }
     }
 }
