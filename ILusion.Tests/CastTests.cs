@@ -7,15 +7,65 @@ namespace ILusion.Tests
 {
     public class CastTests : TestBase
     {
-        // BoxStruct
-        // UnboxStruct
-        // BoxGeneric
-        // UnboxGeneric
-        // CastClassToObject
-        // CastObjectToClass
-        // CastGenericOfTypeToType
-        // CastTypeToGenericOfType
-        // Other....
+        [Fact]
+        public void BoxStruct()
+        {
+            NumericConversionTest(nameof(CastSamples.BoxStruct));
+        }
+
+        [Fact]
+        public void UnboxStruct()
+        {
+            NumericConversionTest(nameof(CastSamples.UnboxStruct));
+        }
+
+        [Fact]
+        public void BoxGeneric()
+        {
+            NumericConversionTest(nameof(CastSamples.BoxGeneric));
+        }
+
+        [Fact]
+        public void UnboxGeneric()
+        {
+            NumericConversionTest(nameof(CastSamples.UnboxGeneric));
+        }
+
+        [Fact]
+        public void BoxStructGeneric()
+        {
+            NumericConversionTest(nameof(CastSamples.BoxStructGeneric));
+        }
+
+        [Fact]
+        public void UnboxStructGeneric()
+        {
+            NumericConversionTest(nameof(CastSamples.UnboxStructGeneric));
+        }
+
+        [Fact]
+        public void CastClassToObject()
+        {
+            IgnoredNumericConversionTest(nameof(CastSamples.CastClassToObject));
+        }
+
+        [Fact]
+        public void CastObjectToClass()
+        {
+            NumericConversionTest(nameof(CastSamples.CastObjectToClass));
+        }
+
+        [Fact]
+        public void CastClassGenericToObject()
+        {
+            NumericConversionTest(nameof(CastSamples.CastClassGenericToObject));
+        }
+
+        [Fact]
+        public void CastObjectToClassGeneric()
+        {
+            NumericConversionTest(nameof(CastSamples.CastObjectToClassGeneric));
+        }
 
         [Fact]
         public void Int8ToUInt8()

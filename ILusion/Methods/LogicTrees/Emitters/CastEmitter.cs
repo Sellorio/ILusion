@@ -20,7 +20,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
 
             if (sourceType.FullName == typeof(object).FullName)
             {
-                if (TypeHelper.IsClass(targetType))
+                if (TypeHelper.IsClass(targetType) && !targetType.IsGenericParameter)
                 {
                     emitterContext.Emit(OpCodes.Castclass, targetType);
                 }
@@ -31,13 +31,10 @@ namespace ILusion.Methods.LogicTrees.Emitters
             }
             else if (targetType.FullName == typeof(object).FullName)
             {
-                if (TypeHelper.IsClass(sourceType))
+                // no cast operation is required when using a class as an object
+                if (!TypeHelper.IsClass(sourceType) || sourceType.IsGenericParameter)
                 {
-                    emitterContext.Emit(OpCodes.Castclass, targetType);
-                }
-                else
-                {
-                    emitterContext.Emit(OpCodes.Box);
+                    emitterContext.Emit(OpCodes.Box, sourceType);
                 }
             }
             else if (TypeHelper.IsClass(sourceType) && TypeHelper.IsClass(targetType))
