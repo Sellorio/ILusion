@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -9,6 +8,21 @@ namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class ParameterParser : IParser
     {
+        private static readonly OpCode?[] _dereferenceOpCodes =
+        {
+            OpCodes.Ldind_I1,
+            OpCodes.Ldind_I2,
+            OpCodes.Ldind_I4,
+            OpCodes.Ldind_I8,
+            OpCodes.Ldind_R4,
+            OpCodes.Ldind_R8,
+            OpCodes.Ldind_Ref,
+            OpCodes.Ldind_U1,
+            OpCodes.Ldind_U2,
+            OpCodes.Ldind_U4,
+            OpCodes.Ldobj
+        };
+
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Ldarg_0,
@@ -51,9 +65,9 @@ namespace ILusion.Methods.LogicTrees.Parsers
                     break;
             }
 
-            if (parameter.ParameterType is ByReferenceType)
+            if (parameter.ParameterType is ByReferenceType byRef)
             {
-                if (instruction.Next?.OpCode != OpCodes.Ldobj)
+                if (!_dereferenceOpCodes.Contains(instruction.Next?.OpCode))
                 {
                     consumedInstructions = 0;
                     node = null;

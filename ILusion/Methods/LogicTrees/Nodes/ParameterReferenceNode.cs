@@ -21,7 +21,11 @@ namespace ILusion.Methods.LogicTrees.Nodes
 
         internal override TypeReference GetValueType()
         {
-            return new PointerType(Parameter.ParameterType);
+            return
+                new PointerType(
+                    Parameter.ParameterType is ByReferenceType byRef
+                        ? byRef.ElementType
+                        : Parameter.ParameterType);
         }
     }
 }
