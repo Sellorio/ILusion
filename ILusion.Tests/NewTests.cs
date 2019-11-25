@@ -208,5 +208,92 @@ namespace ILusion.Tests
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
+
+        [Fact]
+        public void CollectionInitializer()
+        {
+            var sampleMethod = GetSampleMethod(nameof(NewSamples), nameof(NewSamples.CollectionInitializer));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<ActionCallNode>(x,
+                    y =>
+                    {
+                        var newNode = CheckNode<NewNode>(y);
+                        Assert.NotNull(newNode.Type);
+                        Assert.Equal("System.Collections.Generic.List`1<System.String>", newNode.Type.FullName);
+                        Assert.Empty(newNode.Parameters);
+                    },
+                    y => CheckNode<ActionCallNode>(y,
+                        z => CheckNode<CloneNode>(z),
+                        z => CheckNode<LiteralNode>(z)),
+                    y => CheckNode<LiteralNode>(y)),
+                CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+
+        [Fact]
+        public void ArrayInitializer()
+        {
+            var sampleMethod = GetSampleMethod(nameof(NewSamples), nameof(NewSamples.ArrayInitializer));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x,
+                    y =>
+                    {
+                        var newNode =
+                            CheckNode<NewNode>(
+                                y,
+                                z => CheckNode<LiteralNode>(z));
+                        Assert.NotNull(newNode.Type);
+                        Assert.Equal("System.String[]", newNode.Type.FullName);
+                        Assert.Collection(
+                            newNode.Parameters,
+                            z => Assert.Same(NthValueChild(y, 0), z));
+                    },
+                    y => CheckNode<ArrayElementAssignmentNode>(y,
+                        z => CheckNode<CloneNode>(z),
+                        z => CheckNode<LiteralNode>(z),
+                        z => CheckNode<LiteralNode>(z)),
+                    y => CheckNode<ArrayElementAssignmentNode>(y,
+                        z => CheckNode<CloneNode>(z),
+                        z => CheckNode<LiteralNode>(z),
+                        z => CheckNode<LiteralNode>(z))),
+                CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+
+        [Fact]
+        public void AnonymousClass()
+        {
+            var sampleMethod = GetSampleMethod(nameof(NewSamples), nameof(NewSamples.AnonymousClass));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x,
+                    y =>
+                    {
+                        var newNode =
+                            CheckNode<NewNode>(
+                                y,
+                                z => CheckNode<LiteralNode>(z),
+                                z => CheckNode<LiteralNode>(z));
+                        Assert.NotNull(newNode.Type);
+                        Assert.Equal("<>f__AnonymousType0`2<System.String,System.String>", newNode.Type.FullName);
+                        Assert.Collection(
+                            newNode.Parameters,
+                            z => Assert.Same(NthValueChild(y, 0), z),
+                            z => Assert.Same(NthValueChild(y, 1), z));
+                    }),
+                CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
     }
 }

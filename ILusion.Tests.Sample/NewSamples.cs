@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ILusion.Tests.Sample
 {
@@ -44,6 +45,25 @@ namespace ILusion.Tests.Sample
         public static void NewClassToString()
         {
             new Class().ToString();
+        }
+
+        public static void CollectionInitializer()
+        {
+            new List<string>
+            {
+                "a",
+                "b"
+            };
+        }
+
+        public static void ArrayInitializer()
+        {
+            var x = new[] { "a", "b" };
+        }
+
+        public static void AnonymousClass()
+        {
+            var x = new { A = "a", B = "b" };
         }
 
         private static void Static(DateTime val)

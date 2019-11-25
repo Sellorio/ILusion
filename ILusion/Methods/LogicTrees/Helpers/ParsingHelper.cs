@@ -8,7 +8,7 @@ namespace ILusion.Methods.LogicTrees.Helpers
 {
     internal static class ParsingHelper
     {
-        internal static ValueNode[] GetValueNodes(Stack<LogicNode> nodeStack, int count, out LogicNode[] nodes)
+        internal static ValueNode[] GetValueNodes(Stack<LogicNode> nodeStack, int count, out LogicNode[] nodes, bool popNodes = true)
         {
             if (count == 0)
             {
@@ -39,9 +39,12 @@ namespace ILusion.Methods.LogicTrees.Helpers
                 throw new ParsingException("Insufficient values on the evaluation stack.");
             }
 
-            foreach (var node in gatheredNodes)
+            if (popNodes)
             {
-                nodeStack.Pop();
+                foreach (var node in gatheredNodes)
+                {
+                    nodeStack.Pop();
+                }
             }
 
             nodes = Enumerable.Reverse(gatheredNodes).ToArray();

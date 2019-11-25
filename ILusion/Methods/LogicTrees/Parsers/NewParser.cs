@@ -28,7 +28,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
             }
             else if (instruction.OpCode == OpCodes.Newobj)
             {
-                var constructor = ((MethodReference)instruction.Operand).Resolve();
+                var constructor = (MethodReference)instruction.Operand;
                 var parameters = ParsingHelper.GetValueNodes(nodeStack, constructor.Parameters.Count, out var children);
 
                 for (var i = 0; i < parameters.Length; i++)
