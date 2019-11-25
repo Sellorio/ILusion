@@ -30,15 +30,35 @@ namespace ILusion.Methods.LogicTrees.Parsers
             {
                 var constructor = ((MethodReference)instruction.Operand).Resolve();
                 var parameters = ParsingHelper.GetValueNodes(nodeStack, constructor.Parameters.Count, out var children);
+
+                for (var i = 0; i < parameters.Length; i++)
+                {
+                    if (constructor.Parameters[i].ParameterType.FullName == typeof(bool).FullName)
+                    {
+                        ParsingHelper.HandleBooleanLiteral(method, parameters[i]);
+                    }
+                }
+
                 node = new NewNode(parameters, constructor.DeclaringType, constructor, children);
             }
             else // generic type initialization using `new T()`
             {
-                var createInstanceMethod = ((MethodReference)instruction.Operand).Resolve();
+                var createInstanceInstance = (MethodReference)instruction.Operand;
+                var createInstanceMethod = createInstanceInstance.Resolve();
 
-                if (createInstanceMethod.DeclaringType.FullName != typeof(Activator).FullName
-                    || createInstanceMethod.Name != nameof(Activator.CreateInstance)
-                    || !createInstanceMethod.HasGenericParameters)
+                if (createInstanceMethod.DeclaringType.FullName != typeof(Activator).FullName)
+                {
+                    node = null;
+                    consumedInstructions = 0;
+                    return false;
+                }
+                else if (createInstanceMethod.Name != nameof(Activator.CreateInstance))
+                {
+                    node = null;
+                    consumedInstructions = 0;
+                    return false;
+                }
+                else if (!createInstanceMethod.HasGenericParameters)
                 {
                     node = null;
                     consumedInstructions = 0;
@@ -46,7 +66,13 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 }
 
                 var parameters = ParsingHelper.GetValueNodes(nodeStack, createInstanceMethod.Parameters.Count, out var children);
-                node = new NewNode(parameters, createInstanceMethod.DeclaringType, null, children);
+
+                node =
+                    new NewNode(
+                        parameters,
+                        ((GenericInstanceMethod)createInstanceInstance).GenericArguments[0],
+                        null,
+                        children);
             }
 
             return true;

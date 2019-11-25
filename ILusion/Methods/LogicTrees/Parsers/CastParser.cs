@@ -60,6 +60,11 @@ namespace ILusion.Methods.LogicTrees.Parsers
             switch (instruction.OpCode.Code)
             {
                 case Code.Box:
+                    if (((TypeReference)instruction.Operand).FullName == typeof(bool).FullName)
+                    {
+                        ParsingHelper.HandleBooleanLiteral(method, value);
+                    }
+
                     node = new CastNode(value, method.Module.ImportReference(typeof(object)), false, children);
                     break;
                 case Code.Unbox_Any:

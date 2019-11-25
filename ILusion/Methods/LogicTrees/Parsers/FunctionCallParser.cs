@@ -48,12 +48,27 @@ namespace ILusion.Methods.LogicTrees.Parsers
             // Callvirt is used for all instance method calls, not just virtual ones. See here for reason:
             // https://blogs.msdn.microsoft.com/ericgu/2008/07/02/why-does-c-always-use-callvirt/
             var isBaseCall = instruction.OpCode == OpCodes.Call && !calledMethod.IsStatic && !calledMethod.DeclaringType.IsValueType;
-            
+
+            if (!calledMethod.IsStatic && calledMethod.DeclaringType.FullName == typeof(bool).FullName)
+            {
+                ParsingHelper.HandleBooleanLiteral(method, valueNodes[0]);
+            }
+
+            var parameterNodes = calledMethod.IsStatic ? valueNodes : valueNodes.Skip(1).ToArray();
+
+            for (var i = 0; i < parameterNodes.Length; i++)
+            {
+                if (calledMethod.Parameters[i].ParameterType.FullName == typeof(bool).FullName)
+                {
+                    ParsingHelper.HandleBooleanLiteral(method, parameterNodes[i]);
+                }
+            }
+
             node =
                 new FunctionCallNode(
                     methodReference,
                     calledMethod.IsStatic ? null : valueNodes[0],
-                    calledMethod.IsStatic ? valueNodes : valueNodes.Skip(1),
+                    parameterNodes,
                     isBaseCall,
                     constrainedModifier,
                     nodes);

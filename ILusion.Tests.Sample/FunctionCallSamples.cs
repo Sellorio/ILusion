@@ -79,7 +79,7 @@
         public static void CallGenericMethodUsingGenericParameter<T>(T p)
             where T : IGenericParameter
         {
-            p.Execute();
+            StaticMethodWithGenericParameter(p);
         }
 
         private static string StaticParameterlessMethod()
@@ -108,9 +108,9 @@
             return null;
         }
 
-        private static string StaticMethodWithGenericParameter<T>(T p)
+        private static T StaticMethodWithGenericParameter<T>(T p)
         {
-            return null;
+            return default;
         }
 
         private static string StaticMethodWithGenericRefParameter<T>(ref T p)

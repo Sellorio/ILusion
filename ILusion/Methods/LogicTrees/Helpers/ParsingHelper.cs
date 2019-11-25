@@ -1,4 +1,6 @@
 ﻿using ILusion.Exceptions;
+using ILusion.Methods.LogicTrees.Nodes;
+using Mono.Cecil;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -45,6 +47,14 @@ namespace ILusion.Methods.LogicTrees.Helpers
             nodes = Enumerable.Reverse(gatheredNodes).ToArray();
 
             return gatheredNodes.OfType<ValueNode>().Reverse().ToArray();
+        }
+
+        internal static void HandleBooleanLiteral(MethodDefinition method, ValueNode valueNode)
+        {
+            if (valueNode is LiteralNode literal && literal.Value is int integer && (integer == 0 || integer == 1))
+            {
+                literal.ChangeValue(method.Module.ImportReference(typeof(bool)), integer == 1);
+            }
         }
     }
 }

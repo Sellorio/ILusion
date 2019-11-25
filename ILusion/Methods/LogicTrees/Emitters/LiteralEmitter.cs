@@ -52,7 +52,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
                         default:
                             if (intValue >= -127 && intValue <= 127)
                             {
-                                emitterContext.Emit(OpCodes.Ldc_I4_S, intValue);
+                                emitterContext.Emit(OpCodes.Ldc_I4_S, (sbyte)intValue);
                                 return;
                             }
 
@@ -71,6 +71,9 @@ namespace ILusion.Methods.LogicTrees.Emitters
                     break;
                 case string stringValue:
                     emitterContext.Emit(OpCodes.Ldstr, stringValue);
+                    break;
+                case bool booleanValue:
+                    emitterContext.Emit(booleanValue ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
                     break;
                 default:
                     throw new NotSupportedException("Unexpected literal type.");

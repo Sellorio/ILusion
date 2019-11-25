@@ -35,8 +35,10 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
             switch (instruction.OpCode.Code)
             {
-                case Code.Ldc_I4:
                 case Code.Ldc_I4_S:
+                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), (int)(sbyte)instruction.Operand);
+                    break;
+                case Code.Ldc_I4:
                 case Code.Ldc_I8:
                 case Code.Ldc_R4:
                 case Code.Ldc_R8:

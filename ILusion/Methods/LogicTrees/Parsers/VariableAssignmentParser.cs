@@ -44,6 +44,11 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
             var value = ParsingHelper.GetValueNodes(nodeStack, 1, out var children)[0];
 
+            if (variable.VariableType.FullName == typeof(bool).FullName)
+            {
+                ParsingHelper.HandleBooleanLiteral(method, value);
+            }
+
             node = new VariableAssignmentNode(variable, value, children);
             consumedInstructions = 1;
             return true;

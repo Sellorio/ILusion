@@ -23,6 +23,12 @@ namespace ILusion.Methods.LogicTrees.Parsers
             else
             {
                 var returnValue = ParsingHelper.GetValueNodes(nodeStack, 1, out var children)[0];
+
+                if (method.ReturnType.FullName == typeof(bool).FullName)
+                {
+                    ParsingHelper.HandleBooleanLiteral(method, returnValue);
+                }
+
                 node = new ReturnNode(returnValue, children);
             }
 

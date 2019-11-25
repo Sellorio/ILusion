@@ -14,10 +14,5 @@ namespace ILusion.Methods.LogicTrees
         {
             return null;
         }
-
-        internal virtual object GetValue()
-        {
-            return null;
-        }
     }
 }

@@ -596,16 +596,19 @@ namespace ILusion.Tests
                                         x,
                                         y =>
                                         {
-                                            var parameterReferenceNode = CheckNode<ParameterReferenceNode>(y);
+                                            var parameterReferenceNode = CheckNode<ParameterNode>(y);
                                             Assert.NotNull(parameterReferenceNode.Parameter);
                                             Assert.Equal(0, parameterReferenceNode.Parameter.Index);
                                         });
 
                                 Assert.NotNull(functionCallNode.Method);
-                                Assert.Equal("Execute", functionCallNode.Method.Name);
-                                Assert.Same(NthValueChild(x, 0), functionCallNode.Instance);
-                                Assert.Empty(functionCallNode.Parameters);
+                                Assert.Equal("StaticMethodWithGenericParameter", functionCallNode.Method.Name);
+                                Assert.Null(functionCallNode.Instance);
+                                Assert.Collection(
+                                    functionCallNode.Parameters,
+                                    y => Assert.Equal(NthValueChild(x, 0), y));
                                 Assert.False(functionCallNode.IsBaseCall);
+                                Assert.Null(functionCallNode.ConstrainedModifier);
                             });
                 },
                 CheckReturn());

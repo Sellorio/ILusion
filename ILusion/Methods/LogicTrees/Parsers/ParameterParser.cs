@@ -51,6 +51,18 @@ namespace ILusion.Methods.LogicTrees.Parsers
                     break;
             }
 
+            if (parameter.ParameterType is ByReferenceType)
+            {
+                if (instruction.Next?.OpCode != OpCodes.Ldobj)
+                {
+                    consumedInstructions = 0;
+                    node = null;
+                    return false;
+                }
+
+                consumedInstructions = 2;
+            }
+
             node = new ParameterNode(parameter);
             return true;
         }

@@ -4,8 +4,8 @@ namespace ILusion.Methods.LogicTrees.Nodes
 {
     public sealed class LiteralNode : ValueNode
     {
-        private readonly TypeReference _typeOfValue;
-        public object Value { get; }
+        private TypeReference _typeOfValue;
+        public object Value { get; private set; }
 
         internal LiteralNode(TypeReference typeOfValue, object value)
             : base(new LogicNode[0])
@@ -14,9 +14,10 @@ namespace ILusion.Methods.LogicTrees.Nodes
             Value = value;
         }
 
-        internal override object GetValue()
+        internal void ChangeValue(TypeReference typeOfValue, object value)
         {
-            return Value;
+            _typeOfValue = typeOfValue;
+            Value = value;
         }
 
         internal override TypeReference GetValueType()

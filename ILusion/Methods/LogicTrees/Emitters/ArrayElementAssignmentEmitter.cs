@@ -22,6 +22,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
             {
                 switch (elementType.FullName)
                 {
+                    case "System.Boolean":
                     case "System.SByte":
                         emitterContext.Emit(OpCodes.Stelem_I1);
                         break;
