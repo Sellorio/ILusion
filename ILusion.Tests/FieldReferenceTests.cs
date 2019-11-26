@@ -32,6 +32,8 @@ namespace ILusion.Tests
                             });
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
 
         [Fact]
@@ -55,6 +57,8 @@ namespace ILusion.Tests
                             });
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
 
         [Fact]
@@ -82,6 +86,8 @@ namespace ILusion.Tests
                         });
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
     }
 }

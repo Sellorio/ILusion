@@ -8,7 +8,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
         protected override void Emit(EmitterContext<FieldReferenceNode> emitterContext)
         {
             emitterContext.Emit(
-                emitterContext.Node.Field.IsStatic ? OpCodes.Ldsflda : OpCodes.Ldflda,
+                emitterContext.Node.Instance == null ? OpCodes.Ldsflda : OpCodes.Ldflda,
                 emitterContext.Node.Field);
         }
     }
