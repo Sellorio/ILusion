@@ -14,25 +14,25 @@ namespace ILusion.Methods.LogicTrees.Emitters
             {
                 case "System.SByte":
                 case "System.Byte":
-                    emitterContext.Emit(OpCodes.Stind_I1, type);
+                    emitterContext.Emit(OpCodes.Stind_I1);
                     break;
                 case "System.Int16":
                 case "System.UInt16":
-                    emitterContext.Emit(OpCodes.Stind_I2, type);
+                    emitterContext.Emit(OpCodes.Stind_I2);
                     break;
                 case "System.Int32":
                 case "System.UInt32":
-                    emitterContext.Emit(OpCodes.Stind_I4, type);
+                    emitterContext.Emit(OpCodes.Stind_I4);
                     break;
                 case "System.Int64":
                 case "System.UInt64":
-                    emitterContext.Emit(OpCodes.Stind_I8, type);
+                    emitterContext.Emit(OpCodes.Stind_I8);
                     break;
                 case "System.Single":
-                    emitterContext.Emit(OpCodes.Stind_R4, type);
+                    emitterContext.Emit(OpCodes.Stind_R4);
                     break;
                 case "System.Double":
-                    emitterContext.Emit(OpCodes.Stind_R8, type);
+                    emitterContext.Emit(OpCodes.Stind_R8);
                     break;
                 default:
                     if (type.IsValueType)
@@ -41,7 +41,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
                     }
                     else
                     {
-                        emitterContext.Emit(OpCodes.Stind_Ref, type);
+                        emitterContext.Emit(OpCodes.Stind_Ref);
                     }
                     break;
             }
