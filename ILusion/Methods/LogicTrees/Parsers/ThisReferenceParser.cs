@@ -10,12 +10,15 @@ namespace ILusion.Methods.LogicTrees.Parsers
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Ldarga,
-            OpCodes.Ldarga_S
+            OpCodes.Ldarga_S,
+            OpCodes.Ldarg_0
         };
 
         public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
         {
-            if (method.IsStatic || (int)instruction.Operand != 0)
+            if (instruction.OpCode == OpCodes.Ldarg_0 && !method.DeclaringType.IsValueType && instruction.Next?.OpCode != OpCodes.Ldobj
+                || method.IsStatic
+                || instruction.Operand != null && (int)instruction.Operand != 0)
             {
                 node = null;
                 consumedInstructions = 0;

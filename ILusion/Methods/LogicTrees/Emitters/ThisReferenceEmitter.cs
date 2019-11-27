@@ -7,7 +7,14 @@ namespace ILusion.Methods.LogicTrees.Emitters
     {
         protected override void Emit(EmitterContext<ThisReferenceNode> emitterContext)
         {
-            emitterContext.Emit(OpCodes.Ldarga_S, 0);
+            if (emitterContext.Target.DeclaringType.IsValueType)
+            {
+                emitterContext.Emit(OpCodes.Ldarg_0);
+            }
+            else
+            {
+                emitterContext.Emit(OpCodes.Ldarga_S, 0);
+            }
         }
     }
 }

@@ -9,9 +9,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
     {
         public OpCode[] CanTryParse { get; } =
         {
-            OpCodes.Ldarg_0,
-            OpCodes.Ldarg,
-            OpCodes.Ldarg_S
+            OpCodes.Ldarg_0
         };
 
         public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
@@ -23,8 +21,27 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 return false;
             }
 
+            var isStruct = method.DeclaringType.IsValueType;
+
+            if (isStruct)
+            {
+                if (instruction.Next?.OpCode == OpCodes.Ldobj)
+                {
+                    consumedInstructions = 2;
+                }
+                else
+                {
+                    node = null;
+                    consumedInstructions = 0;
+                    return false;
+                }
+            }
+            else
+            {
+                consumedInstructions = 1;
+            }
+
             node = new ThisNode();
-            consumedInstructions = 1;
             return true;
         }
     }

@@ -8,6 +8,11 @@ namespace ILusion.Methods.LogicTrees.Emitters
         protected override void Emit(EmitterContext<ThisNode> emitterContext)
         {
             emitterContext.Emit(OpCodes.Ldarg_0);
+
+            if (emitterContext.Target.DeclaringType.IsValueType)
+            {
+                emitterContext.Emit(OpCodes.Ldobj, emitterContext.Target.DeclaringType);
+            }
         }
     }
 }

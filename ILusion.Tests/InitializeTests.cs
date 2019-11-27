@@ -27,6 +27,8 @@ namespace ILusion.Tests
                     Assert.Empty(initialize.Parameters);
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
 
         [Fact]
@@ -49,6 +51,8 @@ namespace ILusion.Tests
                     Assert.Empty(initialize.Parameters);
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
 
         [Fact]
@@ -71,6 +75,8 @@ namespace ILusion.Tests
                     Assert.Empty(initialize.Parameters);
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
 
         [Fact]
@@ -93,6 +99,8 @@ namespace ILusion.Tests
                     Assert.Empty(initialize.Parameters);
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
 
         [Fact]
@@ -115,6 +123,8 @@ namespace ILusion.Tests
                     Assert.Empty(initialize.Parameters);
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
 
         [Fact]
@@ -137,6 +147,8 @@ namespace ILusion.Tests
                     Assert.Empty(initialize.Parameters);
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
 
         [Fact]
@@ -159,6 +171,8 @@ namespace ILusion.Tests
                     Assert.Empty(initialize.Parameters);
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
 
         [Fact]
@@ -181,6 +195,8 @@ namespace ILusion.Tests
                     Assert.Empty(initialize.Parameters);
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
 
         [Fact]
@@ -210,6 +226,8 @@ namespace ILusion.Tests
                         y => Assert.Same(NthValueChild(x, 3), y));
                 },
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
 
         [Fact]
@@ -227,6 +245,8 @@ namespace ILusion.Tests
                         z => CheckNode<LiteralNode>(z))),
                 x => CheckNode<DiscardNode>(x, y => CheckNode<FunctionCallNode>(y, z => CheckNode<VariableReferenceNode>(z))),
                 CheckReturn());
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
     }
 }
