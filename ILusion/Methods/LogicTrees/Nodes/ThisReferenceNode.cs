@@ -1,18 +1,21 @@
-﻿using Mono.Cecil.Cil;
+﻿using Mono.Cecil;
 using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
     public sealed class ThisReferenceNode : ReferenceValueNode
     {
-        internal ThisReferenceNode()
+        private readonly TypeReference _declaringType;
+
+        internal ThisReferenceNode(TypeReference declaringType)
             : base(Enumerable.Empty<LogicNode>())
         {
+            _declaringType = declaringType;
         }
 
-        internal override Instruction[] ToInstructions()
+        internal override TypeReference GetValueType()
         {
-            return new[] { Instruction.Create(OpCodes.Ldarga_S, 0) };
+            return new PointerType(_declaringType);
         }
     }
 }

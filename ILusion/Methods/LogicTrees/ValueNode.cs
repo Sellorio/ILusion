@@ -10,9 +10,6 @@ namespace ILusion.Methods.LogicTrees
         {
         }
 
-        internal virtual TypeReference GetValueType()
-        {
-            return null;
-        }
+        internal abstract TypeReference GetValueType();
     }
 }

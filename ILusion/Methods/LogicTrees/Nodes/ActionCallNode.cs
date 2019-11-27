@@ -28,10 +28,5 @@ namespace ILusion.Methods.LogicTrees.Nodes
             IsBaseCall = isBaseCall;
             ConstrainedModifier = constrainedModifier;
         }
-
-        internal override Instruction[] ToInstructions()
-        {
-            return new[] { Instruction.Create(Instance == null || IsBaseCall ? OpCodes.Call : OpCodes.Callvirt, Method) };
-        }
     }
 }

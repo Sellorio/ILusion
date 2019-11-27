@@ -14,11 +14,6 @@ namespace ILusion.Methods.LogicTrees.Nodes
             Parameter = parameter;
         }
 
-        internal override Instruction[] ToInstructions()
-        {
-            return new[] { Instruction.Create(Parameter.Index > 255 ? OpCodes.Ldarga : OpCodes.Ldarga_S, Parameter.Index) };
-        }
-
         internal override TypeReference GetValueType()
         {
             return

@@ -41,7 +41,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 consumedInstructions = 1;
             }
 
-            node = new ThisNode();
+            node = new ThisNode(method.DeclaringType);
             return true;
         }
     }

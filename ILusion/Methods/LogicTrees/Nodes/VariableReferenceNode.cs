@@ -13,11 +13,6 @@ namespace ILusion.Methods.LogicTrees.Nodes
             Variable = variable;
         }
 
-        internal override Instruction[] ToInstructions()
-        {
-            return new[] { Instruction.Create(Variable.Index > 255 ? OpCodes.Ldloca : OpCodes.Ldloca_S, Variable.Index) };
-        }
-
         internal override TypeReference GetValueType()
         {
             return new PointerType(Variable.VariableType);

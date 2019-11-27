@@ -25,7 +25,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 return false;
             }
 
-            node = new ThisReferenceNode();
+            node = new ThisReferenceNode(method.DeclaringType);
             consumedInstructions = 1;
             return true;
         }
