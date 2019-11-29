@@ -1,4 +1,5 @@
-﻿using Mono.Cecil;
+﻿using ILusion.Methods.LogicTrees.Nodes;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,18 +34,33 @@ namespace ILusion.Methods.LogicTrees.Helpers
 
             foreach (var instruction in methodDefinition.Body.Instructions.Where(x => x.Operand == firstInstruction))
             {
-                var branchNode = (BranchNode)instructionToNodeMapping[instruction];
-                var targetInstruction = instructionToNodeMapping.First(x => x.Value == branchNode.Target).Key;
-                instruction.Operand = targetInstruction;
+                var node = instructionToNodeMapping[instruction];
 
-                if (targetInstruction.Offset > 255)
+                if (node is BranchNode branchNode)
                 {
-                    instruction.OpCode = ShortToLong[instruction.OpCode];
+                    var targetInstruction = instructionToNodeMapping.First(x => x.Value == branchNode.Target).Key;
+                    UpdateBranchTarget(instruction, targetInstruction);
                 }
-                else
+                else if (node is ReturnNode)
                 {
-                    instruction.OpCode = LongToShort[instruction.OpCode];
+                    var isFunction = methodDefinition.ReturnType.FullName != typeof(void).FullName;
+                    var targetInstruction = methodDefinition.Body.Instructions[methodDefinition.Body.Instructions.Count - (isFunction ? 2 : 1)];
+                    UpdateBranchTarget(instruction, targetInstruction);
                 }
+            }
+        }
+
+        private static void UpdateBranchTarget(Instruction branch, Instruction target)
+        {
+            branch.Operand = target;
+
+            if (target.Offset > 255)
+            {
+                branch.OpCode = ShortToLong[branch.OpCode];
+            }
+            else
+            {
+                branch.OpCode = LongToShort[branch.OpCode];
             }
         }
     }

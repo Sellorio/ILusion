@@ -28,8 +28,7 @@ namespace ILusion.Tests
                         Assert.Null(property.ConstrainedModifier);
                         Assert.Equal("InstanceAutoProperty", property.Property.Name);
                         Assert.Equal("System.String", property.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -55,8 +54,7 @@ namespace ILusion.Tests
                         Assert.Null(property.ConstrainedModifier);
                         Assert.Equal("InstanceGetProperty", property.Property.Name);
                         Assert.Equal("System.String", property.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -82,8 +80,7 @@ namespace ILusion.Tests
                         Assert.Null(property.ConstrainedModifier);
                         Assert.Equal("InstanceVirtualAutoProperty", property.Property.Name);
                         Assert.Equal("System.String", property.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -109,8 +106,7 @@ namespace ILusion.Tests
                         Assert.Null(property.ConstrainedModifier);
                         Assert.Equal("InstanceVirtualGetProperty", property.Property.Name);
                         Assert.Equal("System.String", property.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -134,8 +130,7 @@ namespace ILusion.Tests
                         Assert.Null(property.ConstrainedModifier);
                         Assert.Equal("StaticAutoProperty", property.Property.Name);
                         Assert.Equal("System.String", property.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -159,8 +154,7 @@ namespace ILusion.Tests
                         Assert.Null(property.ConstrainedModifier);
                         Assert.Equal("StaticGetProperty", property.Property.Name);
                         Assert.Equal("System.String", property.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -213,8 +207,7 @@ namespace ILusion.Tests
                         Assert.NotNull(property.ConstrainedModifier);
                         Assert.Equal("T", property.ConstrainedModifier.FullName);
                         Assert.Equal("System.String", property.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -238,8 +231,7 @@ namespace ILusion.Tests
                         Assert.Equal("Property", property.Property.Name);
                         Assert.Null(property.ConstrainedModifier);
                         Assert.Equal("System.String", property.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

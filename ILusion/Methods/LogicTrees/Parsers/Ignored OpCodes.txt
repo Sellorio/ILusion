@@ -1,0 +1,3 @@
+﻿cpobj
+
+Copies object from 1 address to another. Seems to not be used by the C# compiler. This is automatically done on structs anyway by doing ldX and stX.

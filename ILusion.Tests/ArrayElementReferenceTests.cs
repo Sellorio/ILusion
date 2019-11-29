@@ -46,8 +46,7 @@ namespace ILusion.Tests
                     Assert.Null(initialise.Constructor);
                     Assert.Empty(initialise.Parameters);
                     Assert.Same(NthValueChild(x, 0), initialise.Target);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -95,8 +94,7 @@ namespace ILusion.Tests
                     Assert.Null(initialise.Constructor);
                     Assert.Empty(initialise.Parameters);
                     Assert.Same(NthValueChild(x, 0), initialise.Target);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -137,8 +135,7 @@ namespace ILusion.Tests
                             });
 
                     Assert.Equal("RefAction", actionCall.Method.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

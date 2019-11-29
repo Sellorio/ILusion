@@ -2,7 +2,6 @@
 using ILusion.Methods.LogicTrees;
 using ILusion.Methods.LogicTrees.Emitters;
 using ILusion.Methods.LogicTrees.Helpers;
-using ILusion.Methods.LogicTrees.Nodes;
 using ILusion.Methods.LogicTrees.Parsers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -36,6 +35,7 @@ namespace ILusion.Methods
                 .Select(x => (IEmitter)Activator.CreateInstance(x))
                 .ToDictionary(x => x.SupportedNode, x => x);
 
+        internal VariableDefinition ReturnVariable { get; }
         public IReadOnlyList<LogicNode> Statements { get; }
 
         private SyntaxTree(IEnumerable<LogicNode> statements)
@@ -50,13 +50,24 @@ namespace ILusion.Methods
                 throw new ParsingException("Method does not support a body.");
             }
 
+            var returnVariable = VariableHelper.GetReturnVariable(methodDefinition);
             var instructionToNodeMapping = new Dictionary<Instruction, LogicNode>();
 
             methodDefinition.Body.Instructions.Clear();
 
             foreach (var statement in Statements)
             {
-                EmitInstructions(instructionToNodeMapping, methodDefinition, statement);
+                EmitInstructions(instructionToNodeMapping, methodDefinition, statement, returnVariable);
+            }
+
+            if (returnVariable != null)
+            {
+                methodDefinition.Body.Instructions.Add(VariableHelper.CreateLoadVariableInstruction(returnVariable));
+                methodDefinition.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+            }
+            else if (methodDefinition.ReturnType.FullName == typeof(void).FullName)
+            {
+                methodDefinition.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
             }
 
             BranchHelper.UpdateBranchInstructions(instructionToNodeMapping, methodDefinition);
@@ -65,11 +76,12 @@ namespace ILusion.Methods
         private static void EmitInstructions(
             Dictionary<Instruction, LogicNode> instructionToNodeMapping,
             MethodDefinition methodDefinition,
-            LogicNode node)
+            LogicNode node,
+            VariableDefinition returnVariable)
         {
             foreach (var child in node.Children)
             {
-                EmitInstructions(instructionToNodeMapping, methodDefinition, child);
+                EmitInstructions(instructionToNodeMapping, methodDefinition, child, returnVariable);
             }
 
             if (!_mappedEmitters.TryGetValue(node.GetType(), out var emitter))
@@ -77,7 +89,7 @@ namespace ILusion.Methods
                 throw new EmissionException($"No emitter found that supports {node.GetType().Name}.");
             }
 
-            emitter.Emit(instructionToNodeMapping, methodDefinition, node);
+            emitter.Emit(instructionToNodeMapping, methodDefinition, node, returnVariable);
         }
 
         public static SyntaxTree FromMethodDefinition(MethodDefinition methodDefinition)
@@ -87,11 +99,21 @@ namespace ILusion.Methods
                 throw new ParsingException("Method has no body.");
             }
 
+            // most functions will use a variable to store the return value and then return but others may
+            // return a value directly (notably, redirects to a base implementation in a virtual method).
+            // this logic supports the 3 variations to return values
+            var trimmedInstructions = methodDefinition.ReturnType.FullName == typeof(void).FullName ? 1 : 2;
+
+            if (trimmedInstructions == 2 && VariableHelper.GetReturnVariable(methodDefinition) == null)
+            {
+                trimmedInstructions = 0;
+            }
+
             var instructionToNodeMapping = new Dictionary<Instruction, LogicNode>();
             var nodeStack = new Stack<LogicNode>();
             var instructionIndex = 0;
 
-            while (methodDefinition.Body.Instructions.Count > instructionIndex)
+            while (methodDefinition.Body.Instructions.Count - trimmedInstructions > instructionIndex)
             {
                 var instruction = methodDefinition.Body.Instructions[instructionIndex];
 

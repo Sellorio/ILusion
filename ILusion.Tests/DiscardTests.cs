@@ -23,8 +23,7 @@ namespace ILusion.Tests
                             y => CheckNode<FunctionCallNode>(y));
 
                     Assert.Same(NthValueChild(x, 0), discard.DiscardedValue);
-                },
-                CheckReturn());
+                });
         }
     }
 }

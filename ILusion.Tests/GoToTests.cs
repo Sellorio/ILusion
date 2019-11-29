@@ -19,9 +19,9 @@ namespace ILusion.Tests
                 x =>
                 {
                     var goTo = CheckNode<GoToNode>(x);
-                    Assert.Same(syntaxTree.Statements.Last(), goTo.Target);
+                    Assert.Same(syntaxTree.Statements[2], goTo.Target);
                 },
-                CheckReturn());
+                x => CheckNode<ReturnNode>(x));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

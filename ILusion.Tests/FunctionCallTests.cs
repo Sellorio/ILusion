@@ -31,8 +31,7 @@ namespace ILusion.Tests
                                 Assert.Empty(functionCallNode.Parameters);
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -68,8 +67,7 @@ namespace ILusion.Tests
                                 Assert.Collection(functionCallNode.Parameters, y => Assert.Same(NthValueChild(x, 0), y));
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -107,8 +105,7 @@ namespace ILusion.Tests
                                 Assert.Empty(functionCallNode.Parameters);
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -152,8 +149,7 @@ namespace ILusion.Tests
                                 Assert.Collection(functionCallNode.Parameters, y => Assert.Same(NthValueChild(x, 1), y));
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -166,37 +162,19 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                d =>
-                {
-                    CheckNode<VariableAssignmentNode>(
-                        d,
-                        x =>
-                        {
-                            var functionCallNode =
-                                CheckNode<FunctionCallNode>(
-                                    x,
-                                    y => CheckNode<ThisNode>(y));
+                d => CheckNode<ReturnNode>(d,
+                    x =>
+                    {
+                        var functionCallNode =
+                            CheckNode<FunctionCallNode>(x,
+                                y => CheckNode<ThisNode>(y));
 
-                            Assert.NotNull(functionCallNode.Method);
-                            Assert.Equal("CallBaseParameterlessMethod", functionCallNode.Method.Name);
-                            Assert.Equal(NthValueChild(x, 0), functionCallNode.Instance);
-                            Assert.Empty(functionCallNode.Parameters);
-                            Assert.True(functionCallNode.IsBaseCall);
-                        });
-                },
-                x =>
-                {
-                    CheckNode<GoToNode>(x);
-                },
-                x =>
-                {
-                    var returnNode =
-                        CheckNode<ReturnNode>(
-                            x,
-                            y => CheckNode<VariableNode>(y));
-
-                    Assert.Same(NthValueChild(x, 0), returnNode.ReturnValue);
-                });
+                        Assert.NotNull(functionCallNode.Method);
+                        Assert.Equal("CallBaseParameterlessMethod", functionCallNode.Method.Name);
+                        Assert.Equal(NthValueChild(x, 0), functionCallNode.Instance);
+                        Assert.Empty(functionCallNode.Parameters);
+                        Assert.True(functionCallNode.IsBaseCall);
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -250,8 +228,7 @@ namespace ILusion.Tests
                                 Assert.Empty(functionCallNode.Parameters);
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -288,8 +265,7 @@ namespace ILusion.Tests
                                 Assert.Empty(functionCallNode.Parameters);
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -317,8 +293,7 @@ namespace ILusion.Tests
                                 Assert.Empty(functionCallNode.Parameters);
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -346,8 +321,7 @@ namespace ILusion.Tests
                                 Assert.Empty(functionCallNode.Parameters);
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -400,8 +374,7 @@ namespace ILusion.Tests
                                     y => Assert.Same(NthValueChild(x, 0), y));
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -439,8 +412,7 @@ namespace ILusion.Tests
                                     y => Assert.Same(NthValueChild(x, 0), y));
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -478,8 +450,7 @@ namespace ILusion.Tests
                                     y => Assert.Same(NthValueChild(x, 0), y));
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -516,8 +487,7 @@ namespace ILusion.Tests
                                     y => Assert.Same(NthValueChild(x, 0), y));
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -570,8 +540,7 @@ namespace ILusion.Tests
                                     y => Assert.Same(NthValueChild(x, 0), y));
                                 Assert.False(functionCallNode.IsBaseCall);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -610,8 +579,7 @@ namespace ILusion.Tests
                                 Assert.False(functionCallNode.IsBaseCall);
                                 Assert.Null(functionCallNode.ConstrainedModifier);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

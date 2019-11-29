@@ -16,8 +16,7 @@ namespace ILusion.Tests
             CheckStatements(
                 syntaxTree,
                 x => CheckNode<VariableAssignmentNode>(x,
-                    y => CheckNode<ThisNode>(y)),
-                CheckReturn());
+                    y => CheckNode<ThisNode>(y)));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -31,8 +30,7 @@ namespace ILusion.Tests
             CheckStatements(
                 syntaxTree,
                 x => CheckNode<ActionCallNode>(x,
-                    y => CheckNode<ThisNode>(y)),
-                CheckReturn());
+                    y => CheckNode<ThisNode>(y)));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -46,8 +44,7 @@ namespace ILusion.Tests
             CheckStatements(
                 syntaxTree,
                 x => CheckNode<VariableAssignmentNode>(x,
-                    y => CheckNode<ThisNode>(y)),
-                CheckReturn());
+                    y => CheckNode<ThisNode>(y)));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -61,8 +58,7 @@ namespace ILusion.Tests
             CheckStatements(
                 syntaxTree,
                 x => CheckNode<ActionCallNode>(x,
-                    y => CheckNode<ThisNode>(y)),
-                CheckReturn());
+                    y => CheckNode<ThisNode>(y)));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

@@ -13,9 +13,7 @@ namespace ILusion.Tests
             var sampleMethod = GetSampleMethod(nameof(ReturnSamples), nameof(ReturnSamples.Action));
             var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
 
-            CheckStatements(
-                syntaxTree,
-                CheckReturn());
+            CheckStatements(syntaxTree);
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -28,14 +26,11 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
-                    y => CheckNode<LiteralNode>(y)),
-                x => CheckNode<GoToNode>(x),
                 x =>
                 {
                     var returnNode =
                         CheckNode<ReturnNode>(x,
-                            y => CheckNode<VariableNode>(y));
+                            y => CheckNode<LiteralNode>(y));
 
                     Assert.Same(NthValueChild(x, 0), returnNode.ReturnValue);
                 });

@@ -23,8 +23,7 @@ namespace ILusion.Tests
                         Assert.Equal(-1, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -45,8 +44,7 @@ namespace ILusion.Tests
                         Assert.Equal(0, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -67,8 +65,7 @@ namespace ILusion.Tests
                         Assert.Equal(1, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -89,8 +86,7 @@ namespace ILusion.Tests
                         Assert.Equal(2, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -111,8 +107,7 @@ namespace ILusion.Tests
                         Assert.Equal(3, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -133,8 +128,7 @@ namespace ILusion.Tests
                         Assert.Equal(4, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -155,8 +149,7 @@ namespace ILusion.Tests
                         Assert.Equal(5, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -177,8 +170,7 @@ namespace ILusion.Tests
                         Assert.Equal(6, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -199,8 +191,7 @@ namespace ILusion.Tests
                         Assert.Equal(7, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -221,8 +212,7 @@ namespace ILusion.Tests
                         Assert.Equal(8, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -243,8 +233,7 @@ namespace ILusion.Tests
                         Assert.Equal(9, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -265,8 +254,7 @@ namespace ILusion.Tests
                         Assert.Equal(129, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -287,8 +275,7 @@ namespace ILusion.Tests
                         Assert.Equal(int.MaxValue, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -309,8 +296,7 @@ namespace ILusion.Tests
                         Assert.Equal(-129, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -331,8 +317,7 @@ namespace ILusion.Tests
                         Assert.Equal(int.MinValue, literalNode.Value);
                         Assert.Equal("System.Int32", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -353,8 +338,7 @@ namespace ILusion.Tests
                         Assert.Equal(1234567891011, literalNode.Value);
                         Assert.Equal("System.Int64", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -375,8 +359,7 @@ namespace ILusion.Tests
                         Assert.Equal(12.3f, literalNode.Value);
                         Assert.Equal("System.Single", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -397,8 +380,7 @@ namespace ILusion.Tests
                         Assert.Equal(12.3, literalNode.Value);
                         Assert.Equal("System.Double", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -422,8 +404,7 @@ namespace ILusion.Tests
                         y => CheckNode<LiteralNode>(y),
                         y => CheckNode<LiteralNode>(y),
                         y => CheckNode<LiteralNode>(y));
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -444,8 +425,7 @@ namespace ILusion.Tests
                         Assert.Null(literalNode.Value);
                         Assert.Equal("System.Object", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -466,8 +446,7 @@ namespace ILusion.Tests
                         Assert.Null(literalNode.Value);
                         Assert.Equal("System.Object", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -488,8 +467,7 @@ namespace ILusion.Tests
                         Assert.Null(literalNode.Value);
                         Assert.Equal("System.Object", literalNode.GetValueType()?.FullName);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -510,8 +488,7 @@ namespace ILusion.Tests
                         Assert.IsType<bool>(literalNode.Value);
                         Assert.True((bool)literalNode.Value);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -532,8 +509,7 @@ namespace ILusion.Tests
                         Assert.IsType<bool>(literalNode.Value);
                         Assert.False((bool)literalNode.Value);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -564,8 +540,7 @@ namespace ILusion.Tests
                             CheckNode<VariableReferenceNode>(z);
                         });
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -596,8 +571,7 @@ namespace ILusion.Tests
                             CheckNode<VariableReferenceNode>(z);
                         });
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -618,8 +592,7 @@ namespace ILusion.Tests
                         Assert.IsType<bool>(literalNode.Value);
                         Assert.True((bool)literalNode.Value);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -640,8 +613,7 @@ namespace ILusion.Tests
                         Assert.IsType<bool>(literalNode.Value);
                         Assert.False((bool)literalNode.Value);
                     });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -654,14 +626,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x, y =>
-                {
-                    var literalNode = CheckNode<LiteralNode>(y);
-                    Assert.IsType<bool>(literalNode.Value);
-                    Assert.True((bool)literalNode.Value);
-                }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                x => CheckNode<ReturnNode>(x,
+                     y =>
+                     {
+                         var literalNode = CheckNode<LiteralNode>(y);
+                         Assert.IsType<bool>(literalNode.Value);
+                         Assert.True((bool)literalNode.Value);
+                     }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -674,14 +645,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x, y =>
-                {
-                    var literalNode = CheckNode<LiteralNode>(y);
-                    Assert.IsType<bool>(literalNode.Value);
-                    Assert.False((bool)literalNode.Value);
-                }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                x => CheckNode<ReturnNode>(x,
+                    y =>
+                    {
+                        var literalNode = CheckNode<LiteralNode>(y);
+                        Assert.IsType<bool>(literalNode.Value);
+                        Assert.False((bool)literalNode.Value);
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -702,8 +672,7 @@ namespace ILusion.Tests
                         var literalNode = CheckNode<LiteralNode>(y);
                         Assert.IsType<bool>(literalNode.Value);
                         Assert.True((bool)literalNode.Value);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -724,8 +693,7 @@ namespace ILusion.Tests
                         var literalNode = CheckNode<LiteralNode>(y);
                         Assert.IsType<bool>(literalNode.Value);
                         Assert.False((bool)literalNode.Value);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -743,8 +711,7 @@ namespace ILusion.Tests
                     var literalNode = CheckNode<LiteralNode>(z);
                     Assert.IsType<bool>(literalNode.Value);
                     Assert.True((bool)literalNode.Value);
-                })),
-                CheckReturn());
+                })));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -762,8 +729,7 @@ namespace ILusion.Tests
                     var literalNode = CheckNode<LiteralNode>(z);
                     Assert.IsType<bool>(literalNode.Value);
                     Assert.False((bool)literalNode.Value);
-                })),
-                CheckReturn());
+                })));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -787,8 +753,7 @@ namespace ILusion.Tests
                             Assert.IsType<bool>(literalNode.Value);
                             Assert.True((bool)literalNode.Value);
                         },
-                        z => CheckNode<LiteralNode>(z))),
-                CheckReturn());
+                        z => CheckNode<LiteralNode>(z))));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -812,8 +777,7 @@ namespace ILusion.Tests
                             Assert.IsType<bool>(literalNode.Value);
                             Assert.False((bool)literalNode.Value);
                         },
-                        z => CheckNode<LiteralNode>(z))),
-                CheckReturn());
+                        z => CheckNode<LiteralNode>(z))));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -831,8 +795,7 @@ namespace ILusion.Tests
                     var literalNode = CheckNode<LiteralNode>(y);
                     Assert.IsType<bool>(literalNode.Value);
                     Assert.False((bool)literalNode.Value);
-                }),
-                CheckReturn());
+                }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

@@ -21,8 +21,7 @@ namespace ILusion.Tests
                         var parameter = CheckNode<ParameterReferenceNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.String*", parameter.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -41,8 +40,7 @@ namespace ILusion.Tests
                         var parameter = CheckNode<ParameterReferenceNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.String*", parameter.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -61,8 +59,7 @@ namespace ILusion.Tests
                         var parameter = CheckNode<ParameterReferenceNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.DateTime*", parameter.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -82,8 +79,7 @@ namespace ILusion.Tests
                             var parameter = CheckNode<ParameterReferenceNode>(z);
                             Assert.Equal(0, parameter.Parameter?.Index);
                             Assert.Equal("System.DateTime*", parameter.GetValueType()?.FullName);
-                        })),
-                CheckReturn());
+                        })));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -103,8 +99,7 @@ namespace ILusion.Tests
                             var parameter = CheckNode<ParameterReferenceNode>(z);
                             Assert.Equal(0, parameter.Parameter?.Index);
                             Assert.Equal("T*", parameter.GetValueType()?.FullName);
-                        })),
-                CheckReturn());
+                        })));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -124,8 +119,7 @@ namespace ILusion.Tests
                             var parameter = CheckNode<ParameterReferenceNode>(z);
                             Assert.Equal(0, parameter.Parameter?.Index);
                             Assert.Equal("T*", parameter.GetValueType()?.FullName);
-                        })),
-                CheckReturn());
+                        })));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

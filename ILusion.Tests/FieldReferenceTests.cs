@@ -30,8 +30,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(y, 0), fieldReference.Instance);
                                 Assert.Equal("_instance", fieldReference.Field.Name);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -55,8 +54,7 @@ namespace ILusion.Tests
                                 Assert.Null(fieldReference.Instance);
                                 Assert.Equal("_static", fieldReference.Field.Name);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -84,8 +82,7 @@ namespace ILusion.Tests
                                     Assert.Equal("_static", fieldReference.Field.Name);
                                 });
                         });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

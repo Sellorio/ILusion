@@ -32,8 +32,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.SByte", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -63,8 +62,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.Int16", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -94,8 +92,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.Int32", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -125,8 +122,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.Int64", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -156,8 +152,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.Byte", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -187,8 +182,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.UInt16", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -218,8 +212,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.UInt32", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -249,8 +242,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.UInt64", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -280,8 +272,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.Single", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -311,8 +302,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.Double", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -342,8 +332,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.String", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -373,8 +362,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("System.DateTime", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -404,8 +392,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("T", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -435,8 +422,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("T", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -466,8 +452,7 @@ namespace ILusion.Tests
                                 Assert.Same(NthValueChild(arrayElement, 1), arrayElement.Index);
                                 Assert.Equal("T", arrayElement.GetValueType()?.FullName);
                             });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

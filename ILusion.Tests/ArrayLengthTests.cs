@@ -31,8 +31,7 @@ namespace ILusion.Tests
                                 Assert.Equal("System.Int32", arrayLength.GetValueType()?.FullName);
                                 Assert.False(arrayLength.AsLong);
                             });
-                },
-                CheckReturn());
+                });
         }
 
         [Fact]
@@ -59,8 +58,7 @@ namespace ILusion.Tests
                                 Assert.Equal("System.Int32", arrayLength.GetValueType()?.FullName);
                                 Assert.True(arrayLength.AsLong);
                             });
-                },
-                CheckReturn());
+                });
         }
     }
 }

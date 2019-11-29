@@ -15,15 +15,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.DateTime", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -36,15 +34,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.String", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -57,15 +53,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("T", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -78,15 +72,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.SByte", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -99,15 +91,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.Byte", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -120,15 +110,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.Int16", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -141,15 +129,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.UInt16", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -162,15 +148,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.Int32", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -183,15 +167,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.UInt32", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -204,15 +186,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.Int64", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -225,15 +205,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.UInt64", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -246,15 +224,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.Single", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -267,15 +243,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.Double", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -288,15 +262,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.DateTime", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -309,15 +281,13 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
+                x => CheckNode<ReturnNode>(x,
                     y =>
                     {
                         var parameter = CheckNode<ParameterNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.String", parameter.GetValueType()?.FullName);
-                    }),
-                x => CheckNode<GoToNode>(x),
-                x => CheckNode<ReturnNode>(x, y => CheckNode<VariableNode>(y)));
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -336,8 +306,7 @@ namespace ILusion.Tests
                         var parameter = CheckNode<ParameterReferenceNode>(y);
                         Assert.Equal(0, parameter.Parameter?.Index);
                         Assert.Equal("System.String*", parameter.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

@@ -87,8 +87,7 @@ namespace ILusion.Tests
 
                     Assert.Same(NthValueChild(x, 0), referenceAssignment.Reference);
                     Assert.Same(NthValueChild(x, 1), referenceAssignment.Value);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -115,8 +114,7 @@ namespace ILusion.Tests
 
                     Assert.Same(NthValueChild(x, 0), referenceAssignment.Reference);
                     Assert.Same(NthValueChild(x, 1), referenceAssignment.Value);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

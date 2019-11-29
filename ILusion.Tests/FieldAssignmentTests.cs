@@ -26,8 +26,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(x, 1), fieldAssignment.Value);
                     Assert.NotNull(fieldAssignment.Field);
                     Assert.Equal("_instanceClassField", fieldAssignment.Field.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -53,8 +52,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(x, 1), fieldAssignment.Value);
                     Assert.NotNull(fieldAssignment.Field);
                     Assert.Equal("_instanceClassField", fieldAssignment.Field.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -78,8 +76,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(x, 1), fieldAssignment.Value);
                     Assert.NotNull(fieldAssignment.Field);
                     Assert.Equal("_instanceStructField", fieldAssignment.Field.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -101,8 +98,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(x, 0), fieldAssignment.Value);
                     Assert.NotNull(fieldAssignment.Field);
                     Assert.Equal("_staticClassField", fieldAssignment.Field.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -126,8 +122,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(x, 0), fieldAssignment.Value);
                     Assert.NotNull(fieldAssignment.Field);
                     Assert.Equal("_staticClassField", fieldAssignment.Field.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -149,8 +144,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(x, 0), fieldAssignment.Value);
                     Assert.NotNull(fieldAssignment.Field);
                     Assert.Equal("_staticStructField", fieldAssignment.Field.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

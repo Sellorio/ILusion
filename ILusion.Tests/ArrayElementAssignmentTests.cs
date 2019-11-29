@@ -27,8 +27,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(x, 0), elementAssignment.Array);
                     Assert.Same(NthValueChild(x, 1), elementAssignment.Index);
                     Assert.Same(NthValueChild(x, 2), elementAssignment.Value);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -53,8 +52,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(x, 0), elementAssignment.Array);
                     Assert.Same(NthValueChild(x, 1), elementAssignment.Index);
                     Assert.Same(NthValueChild(x, 2), elementAssignment.Value);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -89,8 +87,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(x, 0), elementAssignment.Array);
                     Assert.Same(NthValueChild(x, 1), elementAssignment.Index);
                     Assert.Same(NthValueChild(x, 2), elementAssignment.Value);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -131,8 +128,7 @@ namespace ILusion.Tests
                     Assert.Null(initialise.Constructor);
                     Assert.Empty(initialise.Parameters);
                     Assert.Same(NthValueChild(x, 0), initialise.Target);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -169,8 +165,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(x, 0), elementAssignment.Array);
                     Assert.Same(NthValueChild(x, 1), elementAssignment.Index);
                     Assert.Same(NthValueChild(x, 2), elementAssignment.Value);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -207,8 +202,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(x, 0), elementAssignment.Array);
                     Assert.Same(NthValueChild(x, 1), elementAssignment.Index);
                     Assert.Same(NthValueChild(x, 2), elementAssignment.Value);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

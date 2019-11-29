@@ -25,8 +25,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(initialize, 0), initialize.Target);
                     Assert.Null(initialize.Constructor);
                     Assert.Empty(initialize.Parameters);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -49,8 +48,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(initialize, 0), initialize.Target);
                     Assert.Null(initialize.Constructor);
                     Assert.Empty(initialize.Parameters);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -73,8 +71,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(initialize, 0), initialize.Target);
                     Assert.Null(initialize.Constructor);
                     Assert.Empty(initialize.Parameters);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -97,8 +94,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(initialize, 0), initialize.Target);
                     Assert.Null(initialize.Constructor);
                     Assert.Empty(initialize.Parameters);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -121,8 +117,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(initialize, 0), initialize.Target);
                     Assert.Null(initialize.Constructor);
                     Assert.Empty(initialize.Parameters);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -145,8 +140,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(initialize, 0), initialize.Target);
                     Assert.Null(initialize.Constructor);
                     Assert.Empty(initialize.Parameters);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -169,8 +163,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(initialize, 0), initialize.Target);
                     Assert.Null(initialize.Constructor);
                     Assert.Empty(initialize.Parameters);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -193,8 +186,7 @@ namespace ILusion.Tests
                     Assert.Same(NthValueChild(initialize, 0), initialize.Target);
                     Assert.Null(initialize.Constructor);
                     Assert.Empty(initialize.Parameters);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -224,8 +216,7 @@ namespace ILusion.Tests
                         y => Assert.Same(NthValueChild(x, 1), y),
                         y => Assert.Same(NthValueChild(x, 2), y),
                         y => Assert.Same(NthValueChild(x, 3), y));
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -243,8 +234,7 @@ namespace ILusion.Tests
                         z => CheckNode<LiteralNode>(z),
                         z => CheckNode<LiteralNode>(z),
                         z => CheckNode<LiteralNode>(z))),
-                x => CheckNode<DiscardNode>(x, y => CheckNode<FunctionCallNode>(y, z => CheckNode<VariableReferenceNode>(z))),
-                CheckReturn());
+                x => CheckNode<DiscardNode>(x, y => CheckNode<FunctionCallNode>(y, z => CheckNode<VariableReferenceNode>(z))));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

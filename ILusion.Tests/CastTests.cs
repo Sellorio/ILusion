@@ -1165,8 +1165,7 @@ namespace ILusion.Tests
                                     y,
                                     z => CheckNode<ParameterNode>(z));
                         });
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -1178,8 +1177,7 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
-                CheckReturn());
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

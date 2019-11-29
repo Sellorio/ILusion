@@ -50,26 +50,6 @@ namespace ILusion.Tests
             return result;
         }
 
-        protected Action<LogicNode> CheckReturn(Action<ValueNode> returnValueCheck = null)
-        {
-            return x =>
-            {
-                var returnNode =
-                    returnValueCheck == null
-                        ? CheckNode<ReturnNode>(x)
-                        : CheckNode<ReturnNode>(x, y => returnValueCheck.Invoke(y as ValueNode));
-
-                if (returnValueCheck == null)
-                {
-                    Assert.Null(returnNode.ReturnValue);
-                }
-                else
-                {
-                    Assert.Same(returnNode.Children.OfType<ValueNode>().First(), returnNode.ReturnValue);
-                }
-            };
-        }
-
         protected ValueNode NthValueChild(LogicNode node, int index)
         {
             return node.Children.OfType<ValueNode>().ElementAt(index);

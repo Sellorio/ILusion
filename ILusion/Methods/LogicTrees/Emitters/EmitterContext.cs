@@ -1,4 +1,5 @@
 ﻿using ILusion.Exceptions;
+using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Collections.Generic;
@@ -12,12 +13,14 @@ namespace ILusion.Methods.LogicTrees.Emitters
 
         public MethodDefinition Target { get; }
         public TNode Node { get; }
+        public VariableDefinition ReturnVariable { get; }
 
-        internal EmitterContext(Dictionary<Instruction, LogicNode> instructionToNodeMapping, MethodDefinition target, TNode node)
+        internal EmitterContext(Dictionary<Instruction, LogicNode> instructionToNodeMapping, MethodDefinition target, TNode node, VariableDefinition returnVariable)
         {
             _instructionToNodeMapping = instructionToNodeMapping;
             Target = target;
             Node = node;
+            ReturnVariable = returnVariable;
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode)
@@ -112,9 +115,9 @@ namespace ILusion.Methods.LogicTrees.Emitters
         /// <returns></returns>
         public EmitterContext<TNode> EmitBranch(OpCode opCode)
         {
-            if (!typeof(BranchNode).IsAssignableFrom(typeof(TNode)))
+            if (!typeof(BranchNode).IsAssignableFrom(typeof(TNode)) && typeof(TNode) != typeof(ReturnNode))
             {
-                throw new EmissionException("Can only emit branch instruction from a BranchNode.");
+                throw new EmissionException("Can only emit branch instruction from a BranchNode and ReturnNode.");
             }
 
             if (Target.Body.Instructions.Count == 0)

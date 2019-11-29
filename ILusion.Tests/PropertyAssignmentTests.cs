@@ -30,8 +30,7 @@ namespace ILusion.Tests
                     Assert.Null(propertyAssignment.ConstrainedModifier);
                     Assert.NotNull(propertyAssignment.SetMethod);
                     Assert.Equal("set_InstanceAutoProperty", propertyAssignment.SetMethod.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -59,8 +58,7 @@ namespace ILusion.Tests
                     Assert.Null(propertyAssignment.ConstrainedModifier);
                     Assert.NotNull(propertyAssignment.SetMethod);
                     Assert.Equal("set_InstanceSetProperty", propertyAssignment.SetMethod.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -88,8 +86,7 @@ namespace ILusion.Tests
                     Assert.Null(propertyAssignment.ConstrainedModifier);
                     Assert.NotNull(propertyAssignment.SetMethod);
                     Assert.Equal("set_InstanceVirtualAutoProperty", propertyAssignment.SetMethod.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -117,8 +114,7 @@ namespace ILusion.Tests
                     Assert.Null(propertyAssignment.ConstrainedModifier);
                     Assert.NotNull(propertyAssignment.SetMethod);
                     Assert.Equal("set_InstanceVirtualSetProperty", propertyAssignment.SetMethod.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -145,8 +141,7 @@ namespace ILusion.Tests
                     Assert.Null(propertyAssignment.ConstrainedModifier);
                     Assert.NotNull(propertyAssignment.SetMethod);
                     Assert.Equal("set_StaticAutoProperty", propertyAssignment.SetMethod.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -173,8 +168,7 @@ namespace ILusion.Tests
                     Assert.Null(propertyAssignment.ConstrainedModifier);
                     Assert.NotNull(propertyAssignment.SetMethod);
                     Assert.Equal("set_StaticSetProperty", propertyAssignment.SetMethod.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -202,8 +196,7 @@ namespace ILusion.Tests
                     Assert.Null(propertyAssignment.ConstrainedModifier);
                     Assert.NotNull(propertyAssignment.SetMethod);
                     Assert.Equal("set_BaseProperty", propertyAssignment.SetMethod.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -232,8 +225,7 @@ namespace ILusion.Tests
                     Assert.Equal("T", propertyAssignment.ConstrainedModifier.FullName);
                     Assert.NotNull(propertyAssignment.SetMethod);
                     Assert.Equal("set_Prop", propertyAssignment.SetMethod.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -260,8 +252,7 @@ namespace ILusion.Tests
                     Assert.Null(propertyAssignment.ConstrainedModifier);
                     Assert.NotNull(propertyAssignment.SetMethod);
                     Assert.Equal("set_Property", propertyAssignment.SetMethod.Name);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

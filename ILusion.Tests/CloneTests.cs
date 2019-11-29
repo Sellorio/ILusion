@@ -35,8 +35,7 @@ namespace ILusion.Tests
                     y => CheckNode<ArrayElementAssignmentNode>(y,
                         z => CheckNode<CloneNode>(z),
                         z => CheckNode<LiteralNode>(z),
-                        z => CheckNode<LiteralNode>(z))),
-                CheckReturn());
+                        z => CheckNode<LiteralNode>(z))));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

@@ -24,8 +24,7 @@ namespace ILusion.Tests
                         Assert.NotNull(variable.Variable);
                         Assert.Equal(0, variable.Variable.Index);
                         Assert.Equal("System.String*", variable.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -45,8 +44,7 @@ namespace ILusion.Tests
                         Assert.NotNull(variable.Variable);
                         Assert.Equal(0, variable.Variable.Index);
                         Assert.Equal("System.DateTime*", variable.GetValueType()?.FullName);
-                    }),
-                CheckReturn());
+                    }));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -69,8 +67,7 @@ namespace ILusion.Tests
                             Assert.NotNull(variable.Variable);
                             Assert.Equal(0, variable.Variable.Index);
                             Assert.Equal("System.DateTime*", variable.GetValueType()?.FullName);
-                        })),
-                CheckReturn());
+                        })));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -93,8 +90,7 @@ namespace ILusion.Tests
                             Assert.NotNull(variable.Variable);
                             Assert.Equal(0, variable.Variable.Index);
                             Assert.Equal("T*", variable.GetValueType()?.FullName);
-                        })),
-                CheckReturn());
+                        })));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -117,8 +113,7 @@ namespace ILusion.Tests
                             Assert.NotNull(variable.Variable);
                             Assert.Equal(0, variable.Variable.Index);
                             Assert.Equal("T*", variable.GetValueType()?.FullName);
-                        })),
-                CheckReturn());
+                        })));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

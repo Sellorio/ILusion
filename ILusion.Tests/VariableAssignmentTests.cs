@@ -21,8 +21,7 @@ namespace ILusion.Tests
                     Assert.NotNull(variableAssignment.Variable);
                     Assert.Equal(0, variableAssignment.Variable.Index);
                     Assert.Equal(NthValueChild(x, 0), variableAssignment.Value);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -41,8 +40,7 @@ namespace ILusion.Tests
                     Assert.NotNull(variableAssignment.Variable);
                     Assert.Equal(0, variableAssignment.Variable.Index);
                     Assert.Equal(NthValueChild(x, 0), variableAssignment.Value);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -61,8 +59,7 @@ namespace ILusion.Tests
                     Assert.NotNull(variableAssignment.Variable);
                     Assert.Equal(0, variableAssignment.Variable.Index);
                     Assert.Equal(NthValueChild(x, 0), variableAssignment.Value);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -81,8 +78,7 @@ namespace ILusion.Tests
                     Assert.NotNull(variableAssignment.Variable);
                     Assert.Equal(0, variableAssignment.Variable.Index);
                     Assert.Equal(NthValueChild(x, 0), variableAssignment.Value);
-                },
-                CheckReturn());
+                });
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
