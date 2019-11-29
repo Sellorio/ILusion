@@ -19,39 +19,37 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Stloc_3
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
             VariableDefinition variable;
 
-            switch (instruction.OpCode.Code)
+            switch (parsingContext.Instruction.OpCode.Code)
             {
                 case Code.Stloc_0:
-                    variable = method.Body.Variables.First(x => x.Index == 0);
+                    variable = parsingContext.Method.Body.Variables.First(x => x.Index == 0);
                     break;
                 case Code.Stloc_1:
-                    variable = method.Body.Variables.First(x => x.Index == 1);
+                    variable = parsingContext.Method.Body.Variables.First(x => x.Index == 1);
                     break;
                 case Code.Stloc_2:
-                    variable = method.Body.Variables.First(x => x.Index == 2);
+                    variable = parsingContext.Method.Body.Variables.First(x => x.Index == 2);
                     break;
                 case Code.Stloc_3:
-                    variable = method.Body.Variables.First(x => x.Index == 3);
+                    variable = parsingContext.Method.Body.Variables.First(x => x.Index == 3);
                     break;
                 default:
-                    variable = (VariableDefinition)instruction.Operand;
+                    variable = (VariableDefinition)parsingContext.Instruction.Operand;
                     break;
             }
 
-            var value = ParsingHelper.GetValueNodes(nodeStack, 1, out var children)[0];
+            var value = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 1, out var children)[0];
 
             if (variable.VariableType.FullName == typeof(bool).FullName)
             {
-                ParsingHelper.HandleBooleanLiteral(method, value);
+                ParsingHelper.HandleBooleanLiteral(parsingContext.Method, value);
             }
 
-            node = new VariableAssignmentNode(variable, value, children);
-            consumedInstructions = 1;
-            return true;
+            return parsingContext.Success(new VariableAssignmentNode(variable, value, children));
         }
     }
 }

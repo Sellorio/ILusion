@@ -50,11 +50,9 @@ namespace ILusion.Methods.LogicTrees.Helpers
             }
         }
 
-        private static void UpdateBranchTarget(Instruction branch, Instruction target)
+        internal static void UpdateBranchOpCode(Instruction branch)
         {
-            branch.Operand = target;
-
-            if (target.Offset > 255)
+            if (((Instruction)branch.Operand).Offset > 255)
             {
                 branch.OpCode = ShortToLong[branch.OpCode];
             }
@@ -62,6 +60,12 @@ namespace ILusion.Methods.LogicTrees.Helpers
             {
                 branch.OpCode = LongToShort[branch.OpCode];
             }
+        }
+
+        private static void UpdateBranchTarget(Instruction branch, Instruction target)
+        {
+            branch.Operand = target;
+            UpdateBranchOpCode(branch);
         }
     }
 }

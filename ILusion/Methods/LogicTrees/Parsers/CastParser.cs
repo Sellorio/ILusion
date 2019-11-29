@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using ILusion.Exceptions;
 using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
@@ -52,110 +50,82 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Conv_U8
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            var value = ParsingHelper.GetValueNodes(nodeStack, 1, out var children)[0];
-            consumedInstructions = 1;
+            var value = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 1, out var children)[0];
 
-            switch (instruction.OpCode.Code)
+            switch (parsingContext.Instruction.OpCode.Code)
             {
                 case Code.Box:
-                    if (((TypeReference)instruction.Operand).FullName == typeof(bool).FullName)
+                    if (((TypeReference)parsingContext.Instruction.Operand).FullName == typeof(bool).FullName)
                     {
-                        ParsingHelper.HandleBooleanLiteral(method, value);
+                        ParsingHelper.HandleBooleanLiteral(parsingContext.Method, value);
                     }
 
-                    node = new CastNode(value, method.Module.ImportReference(typeof(object)), false, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(object)), false, children));
                 case Code.Unbox_Any:
-                    node = new CastNode(value, (TypeReference)instruction.Operand, false, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, (TypeReference)parsingContext.Instruction.Operand, false, children));
                 case Code.Castclass:
-                    node = new CastNode(value, (TypeReference)instruction.Operand, false, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, (TypeReference)parsingContext.Instruction.Operand, false, children));
                 case Code.Conv_I1:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(sbyte)), false, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(sbyte)), false, children));
                 case Code.Conv_I2:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(short)), false, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(short)), false, children));
                 case Code.Conv_I4:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(int)), false, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(int)), false, children));
                 case Code.Conv_I8:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(long)), false, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(long)), false, children));
                 case Code.Conv_Ovf_I1:
                 case Code.Conv_Ovf_I1_Un:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(sbyte)), true, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(sbyte)), true, children));
                 case Code.Conv_Ovf_I2:
                 case Code.Conv_Ovf_I2_Un:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(short)), true, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(short)), true, children));
                 case Code.Conv_Ovf_I4:
                 case Code.Conv_Ovf_I4_Un:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(int)), true, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(int)), true, children));
                 case Code.Conv_Ovf_I8:
                 case Code.Conv_Ovf_I8_Un:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(long)), true, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(long)), true, children));
                 case Code.Conv_Ovf_U1:
                 case Code.Conv_Ovf_U1_Un:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(byte)), true, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(byte)), true, children));
                 case Code.Conv_Ovf_U2:
                 case Code.Conv_Ovf_U2_Un:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(ushort)), true, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(ushort)), true, children));
                 case Code.Conv_Ovf_U4:
                 case Code.Conv_Ovf_U4_Un:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(uint)), true, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(uint)), true, children));
                 case Code.Conv_Ovf_U8:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(ulong)), true, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(ulong)), true, children));
                 case Code.Conv_R4:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(float)), true, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(float)), true, children));
                 case Code.Conv_R8:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(double)), true, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(double)), true, children));
                 case Code.Conv_R_Un:
-                    consumedInstructions = 2;
-
-                    if (instruction.Next.OpCode == OpCodes.Conv_R4)
+                    if (parsingContext.Instruction.Next.OpCode == OpCodes.Conv_R4)
                     {
-                        node = new CastNode(value, method.Module.ImportReference(typeof(float)), true, children);
+                        return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(float)), true, children), 2);
                     }
-                    else if (instruction.Next.OpCode == OpCodes.Conv_R8)
+                    else if (parsingContext.Instruction.Next.OpCode == OpCodes.Conv_R8)
                     {
-                        node = new CastNode(value, method.Module.ImportReference(typeof(double)), true, children);
+                        return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(double)), true, children), 2);
                     }
                     else
                     {
                         throw new ParsingException("Expected specific cast to either Single or Double.");
                     }
-
-                    break;
                 case Code.Conv_U1:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(byte)), false, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(byte)), false, children));
                 case Code.Conv_U2:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(ushort)), false, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(ushort)), false, children));
                 case Code.Conv_U4:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(uint)), false, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(uint)), false, children));
                 case Code.Conv_U8:
-                    node = new CastNode(value, method.Module.ImportReference(typeof(ulong)), false, children);
-                    break;
+                    return parsingContext.Success(new CastNode(value, parsingContext.Method.Module.ImportReference(typeof(ulong)), false, children));
                 default:
                     throw new NotSupportedException("Internal Error: operation not parsed by parser.");
             }
-
-            return true;
         }
     }
 }

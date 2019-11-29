@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
@@ -16,11 +15,9 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Constrained
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            node = default;
-            consumedInstructions = default;
-
+            var instruction = parsingContext.Instruction;
             var constrainedModifier = instruction.OpCode == OpCodes.Constrained ? (TypeReference)instruction.Operand : null;
 
             if (constrainedModifier != null)
@@ -37,24 +34,22 @@ namespace ILusion.Methods.LogicTrees.Parsers
             }
 
             var expectedStackValues = calledMethod.IsStatic ? 1 : 2;
-            var valueNodes = ParsingHelper.GetValueNodes(nodeStack, expectedStackValues, out var nodes);
+            var valueNodes = ParsingHelper.GetValueNodes(parsingContext.NodeStack, expectedStackValues, out var nodes);
 
             var property = calledMethod.DeclaringType.Properties.First(x => x.SetMethod == calledMethod);
             var isBaseCall = instruction.OpCode == OpCodes.Call && !calledMethod.IsStatic && !calledMethod.DeclaringType.IsValueType && calledMethod.IsVirtual;
 
-            node =
-                new PropertyAssignmentNode(
-                    calledMethod.IsStatic ? null : valueNodes[0],
-                    calledMethod.IsStatic ? valueNodes[0] : valueNodes[1],
-                    property,
-                    methodReference,
-                    isBaseCall,
-                    constrainedModifier,
-                    nodes);
-
-            consumedInstructions = constrainedModifier != null ? 2 : 1;
-
-            return true;
+            return
+                parsingContext.Success(
+                    new PropertyAssignmentNode(
+                        calledMethod.IsStatic ? null : valueNodes[0],
+                        calledMethod.IsStatic ? valueNodes[0] : valueNodes[1],
+                        property,
+                        methodReference,
+                        isBaseCall,
+                        constrainedModifier,
+                        nodes),
+                    constrainedModifier != null ? 2 : 1);
         }
     }
 }

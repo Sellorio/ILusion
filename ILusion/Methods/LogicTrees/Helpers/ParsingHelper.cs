@@ -1,6 +1,9 @@
 ﻿using ILusion.Exceptions;
 using ILusion.Methods.LogicTrees.Nodes;
+using ILusion.Methods.LogicTrees.Parsers;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,6 +11,18 @@ namespace ILusion.Methods.LogicTrees.Helpers
 {
     internal static class ParsingHelper
     {
+        private static readonly IParser[] _parsers =
+            typeof(IParser).Assembly.GetTypes()
+                .Where(x => !x.IsInterface && !x.IsAbstract && x.Namespace == typeof(IParser).Namespace && typeof(IParser).IsAssignableFrom(x))
+                .Select(x => (IParser)Activator.CreateInstance(x))
+                .ToArray();
+
+        private static readonly Dictionary<OpCode, IParser[]> _mappedParsers =
+            _parsers
+                .SelectMany(x => x.CanTryParse.Select(y => new KeyValuePair<OpCode, IParser>(y, x)))
+                .GroupBy(x => x.Key)
+                .ToDictionary(x => x.Key, x => x.Select(y => y.Value).ToArray());
+
         internal static ValueNode[] GetValueNodes(Stack<LogicNode> nodeStack, int count, out LogicNode[] nodes, bool popNodes = true)
         {
             if (count == 0)
@@ -57,6 +72,57 @@ namespace ILusion.Methods.LogicTrees.Helpers
             if (valueNode is LiteralNode literal && literal.Value is int integer && (integer == 0 || integer == 1))
             {
                 literal.ChangeValue(method.Module.ImportReference(typeof(bool)), integer == 1);
+            }
+        }
+
+        internal static IEnumerable<LogicNode> ParseBlock(
+            MethodDefinition methodDefinition,
+            Dictionary<Instruction, LogicNode> instructionToNodeMapping,
+            Instruction inclusiveStart,
+            Instruction exclusiveEnd)
+        {
+            var nodeStack = new Stack<LogicNode>();
+            var index = methodDefinition.Body.Instructions.IndexOf(inclusiveStart);
+
+            while (methodDefinition.Body.Instructions[index] != exclusiveEnd)
+            {
+                ParseInstruction(methodDefinition, ref index, instructionToNodeMapping, nodeStack);
+            }
+
+            return nodeStack.Reverse();
+        }
+
+        internal static void ParseInstruction(
+            MethodDefinition methodDefinition,
+            ref int instructionIndex,
+            Dictionary<Instruction, LogicNode> instructionToNodeMapping,
+            Stack<LogicNode> nodeStack)
+        {
+            var instruction = methodDefinition.Body.Instructions[instructionIndex];
+
+            if (!_mappedParsers.TryGetValue(instruction.OpCode, out var parsers))
+            {
+                throw new ParsingException("OpCode " + instruction.OpCode + " is not supported by any parsers.");
+            }
+
+            var parsingContext = new ParsingContext(methodDefinition, nodeStack, instruction, instructionToNodeMapping);
+            var instructionParsed = false;
+
+            foreach (var parser in parsers)
+            {
+                if (parser.TryParse(parsingContext))
+                {
+                    instructionToNodeMapping.Add(instruction, parsingContext.Result);
+                    nodeStack.Push(parsingContext.Result);
+                    instructionParsed = true;
+                    instructionIndex += parsingContext.ConsumedInstructions;
+                    break;
+                }
+            }
+
+            if (!instructionParsed)
+            {
+                throw new ParsingException($"Failed to parse instruction ({instruction}).");
             }
         }
     }

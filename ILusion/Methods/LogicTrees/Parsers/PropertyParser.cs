@@ -16,10 +16,9 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Constrained
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            node = default;
-            consumedInstructions = default;
+            var instruction = parsingContext.Instruction;
 
             var constrainedModifier = instruction.OpCode == OpCodes.Constrained ? (TypeReference)instruction.Operand : null;
 
@@ -37,15 +36,15 @@ namespace ILusion.Methods.LogicTrees.Parsers
             }
 
             var expectedStackValues = calledMethod.IsStatic ? 0 : 1;
-            var valueNodes = ParsingHelper.GetValueNodes(nodeStack, expectedStackValues, out var nodes);
+            var valueNodes = ParsingHelper.GetValueNodes(parsingContext.NodeStack, expectedStackValues, out var nodes);
 
             var property = calledMethod.DeclaringType.Properties.First(x => x.GetMethod == calledMethod);
             var isBaseCall = instruction.OpCode == OpCodes.Call && !calledMethod.IsStatic && !calledMethod.DeclaringType.IsValueType && calledMethod.IsVirtual;
 
-            node = new PropertyNode(calledMethod.IsStatic ? null : valueNodes[0], property, methodReference, isBaseCall, constrainedModifier, nodes);
-            consumedInstructions = constrainedModifier != null ? 2 : 1;
-
-            return true;
+            return
+                parsingContext.Success(
+                    new PropertyNode(calledMethod.IsStatic ? null : valueNodes[0], property, methodReference, isBaseCall, constrainedModifier, nodes),
+                    constrainedModifier != null ? 2 : 1);
         }
     }
 }

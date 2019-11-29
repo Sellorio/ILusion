@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using ILusion.Methods.LogicTrees.Helpers;
+﻿using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -14,13 +13,17 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Stsfld
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            var isStatic = instruction.OpCode == OpCodes.Stsfld;
-            var valueNodes = ParsingHelper.GetValueNodes(nodeStack, isStatic ? 1 : 2, out var children);
-            node = new FieldAssignmentNode(isStatic ? null : valueNodes[0], valueNodes[isStatic ? 0 : 1], (FieldReference)instruction.Operand, children);
-            consumedInstructions = 1;
-            return true;
+            var isStatic = parsingContext.Instruction.OpCode == OpCodes.Stsfld;
+            var valueNodes = ParsingHelper.GetValueNodes(parsingContext.NodeStack, isStatic ? 1 : 2, out var children);
+
+            return
+                parsingContext.Success(
+                    new FieldAssignmentNode(
+                        isStatic ? null : valueNodes[0],
+                        valueNodes[isStatic ? 0 : 1],
+                        (FieldReference)parsingContext.Instruction.Operand, children));
         }
     }
 }

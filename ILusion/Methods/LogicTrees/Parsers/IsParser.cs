@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ILusion.Methods.LogicTrees.Helpers;
+﻿using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -14,12 +12,12 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Isinst
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            var nextInstruction = instruction.Next;
+            var nextInstruction = parsingContext.Instruction.Next;
             var nextNextInstruction = nextInstruction?.Next;
             VariableDefinition castVariable = null;
-            consumedInstructions = 1;
+            var consumedInstructions = 1;
 
             // Is with variable stores and then loads the variable value, if the next op codes are a condition then
             // it is an Is, otherwise it is an As.
@@ -27,14 +25,12 @@ namespace ILusion.Methods.LogicTrees.Parsers
             {
                 if (!nextNextInstruction?.OpCode.ToString().StartsWith("ldloc") ?? false)
                 {
-                    node = null;
-                    consumedInstructions = 0;
                     return false;
                 }
 
-                castVariable = VariableHelper.GetVariableFromInstruction(method, nextInstruction);
+                castVariable = VariableHelper.GetVariableFromInstruction(parsingContext.Method, nextInstruction);
 
-                if (castVariable == VariableHelper.GetVariableFromInstruction(method, nextNextInstruction))
+                if (castVariable == VariableHelper.GetVariableFromInstruction(parsingContext.Method, nextNextInstruction))
                 {
                     nextInstruction = nextNextInstruction.Next;
                     nextNextInstruction = nextInstruction?.Next;
@@ -42,8 +38,6 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 }
                 else
                 {
-                    node = null;
-                    consumedInstructions = 0;
                     return false;
                 }
             }
@@ -59,14 +53,20 @@ namespace ILusion.Methods.LogicTrees.Parsers
             }
             else
             {
-                node = null;
-                consumedInstructions = 0;
                 return false;
             }
 
-            var value = ParsingHelper.GetValueNodes(nodeStack, 1, out var children)[0];
-            node = new IsNode(value, (TypeReference)instruction.Operand, castVariable, (TypeReference)instruction.Operand, children);
-            return true;
+            var value = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 1, out var children)[0];
+
+            return
+                parsingContext.Success(
+                    new IsNode(
+                        value,
+                        (TypeReference)parsingContext.Instruction.Operand,
+                        castVariable,
+                        (TypeReference)parsingContext.Instruction.Operand,
+                        children),
+                    consumedInstructions);
         }
     }
 }

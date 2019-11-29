@@ -19,59 +19,48 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Ldarg
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            if (instruction.OpCode == OpCodes.Ldarga || instruction.OpCode == OpCodes.Ldarga_S)
+            if (parsingContext.Instruction.OpCode == OpCodes.Ldarga || parsingContext.Instruction.OpCode == OpCodes.Ldarga_S)
             {
-                node = new ParameterReferenceNode((ParameterDefinition)instruction.Operand);
-                consumedInstructions = 1;
-                return true;
+                return parsingContext.Success(new ParameterReferenceNode((ParameterDefinition)parsingContext.Instruction.Operand));
             }
 
-            if (instruction.OpCode == OpCodes.Ldarg_0 && !method.IsStatic)
+            if (parsingContext.Instruction.OpCode == OpCodes.Ldarg_0 && !parsingContext.Method.IsStatic)
             {
-                node = null;
-                consumedInstructions = 0;
                 return false;
             }
-
-            consumedInstructions = 1;
 
             ParameterDefinition parameter;
 
-            switch (instruction.OpCode.Code)
+            switch (parsingContext.Instruction.OpCode.Code)
             {
                 case Code.Ldarg_0:
-                    parameter = method.Parameters[0];
+                    parameter = parsingContext.Method.Parameters[0];
                     break;
                 case Code.Ldarg_1:
-                    parameter = method.Parameters[method.IsStatic ? 1 : 0];
+                    parameter = parsingContext.Method.Parameters[parsingContext.Method.IsStatic ? 1 : 0];
                     break;
                 case Code.Ldarg_2:
-                    parameter = method.Parameters[method.IsStatic ? 2 : 1];
+                    parameter = parsingContext.Method.Parameters[parsingContext.Method.IsStatic ? 2 : 1];
                     break;
                 case Code.Ldarg_3:
-                    parameter = method.Parameters[method.IsStatic ? 3 : 2];
+                    parameter = parsingContext.Method.Parameters[parsingContext.Method.IsStatic ? 3 : 2];
                     break;
                 case Code.Ldarga:
                 case Code.Ldarga_S:
-                    node = new ParameterReferenceNode((ParameterDefinition)instruction.Operand);
-                    consumedInstructions = 1;
-                    return true;
+                    return parsingContext.Success(new ParameterReferenceNode((ParameterDefinition)parsingContext.Instruction.Operand));
                 default:
-                    parameter = (ParameterDefinition)instruction.Operand;
+                    parameter = (ParameterDefinition)parsingContext.Instruction.Operand;
                     break;
             }
 
-            if (!(parameter.ParameterType is ByReferenceType) || instruction.Next?.OpCode == OpCodes.Ldobj)
+            if (!(parameter.ParameterType is ByReferenceType) || parsingContext.Instruction.Next?.OpCode == OpCodes.Ldobj)
             {
-                consumedInstructions = 0;
-                node = null;
                 return false;
             }
 
-            node = new ParameterReferenceNode(parameter);
-            return true;
+            return parsingContext.Success(new ParameterReferenceNode(parameter));
         }
     }
 }

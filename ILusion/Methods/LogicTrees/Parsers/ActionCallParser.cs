@@ -17,10 +17,9 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Constrained
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            node = default;
-            consumedInstructions = default;
+            var instruction = parsingContext.Instruction;
 
             var constrainedModifier = instruction.OpCode == OpCodes.Constrained ? (TypeReference)instruction.Operand : null;
 
@@ -42,7 +41,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
             }
 
             var expectedStackValues = calledMethod.IsStatic ? calledMethod.Parameters.Count : calledMethod.Parameters.Count + 1;
-            var valueNodes = ParsingHelper.GetValueNodes(nodeStack, expectedStackValues, out var nodes);
+            var valueNodes = ParsingHelper.GetValueNodes(parsingContext.NodeStack, expectedStackValues, out var nodes);
 
             // Callvirt is used for all instance method calls, not just virtual ones. See here for reason:
             // https://blogs.msdn.microsoft.com/ericgu/2008/07/02/why-does-c-always-use-callvirt/
@@ -50,7 +49,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
             if (!calledMethod.IsStatic && calledMethod.DeclaringType.FullName == typeof(bool).FullName)
             {
-                ParsingHelper.HandleBooleanLiteral(method, valueNodes[0]);
+                ParsingHelper.HandleBooleanLiteral(parsingContext.Method, valueNodes[0]);
             }
 
             var parameterNodes = calledMethod.IsStatic ? valueNodes : valueNodes.Skip(1).ToArray();
@@ -59,22 +58,20 @@ namespace ILusion.Methods.LogicTrees.Parsers
             {
                 if (calledMethod.Parameters[i].ParameterType.FullName == typeof(bool).FullName)
                 {
-                    ParsingHelper.HandleBooleanLiteral(method, parameterNodes[i]);
+                    ParsingHelper.HandleBooleanLiteral(parsingContext.Method, parameterNodes[i]);
                 }
             }
 
-            node =
-                new ActionCallNode(
-                    methodReference,
-                    calledMethod.IsStatic ? null : valueNodes[0],
-                    parameterNodes,
-                    isBaseCall,
-                    constrainedModifier,
-                    nodes);
-
-            consumedInstructions = constrainedModifier != null ? 2 : 1;
-
-            return true;
+            return
+                parsingContext.Success(
+                    new ActionCallNode(
+                        methodReference,
+                        calledMethod.IsStatic ? null : valueNodes[0],
+                        parameterNodes,
+                        isBaseCall,
+                        constrainedModifier,
+                        nodes),
+                    constrainedModifier != null ? 2 : 1);
         }
     }
 }

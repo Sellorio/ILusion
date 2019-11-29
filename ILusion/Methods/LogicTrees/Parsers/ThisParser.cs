@@ -12,27 +12,25 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Ldarg_0
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            if (method.IsStatic || instruction.OpCode != OpCodes.Ldarg_0 && (int)instruction.Operand != 0)
+            if (parsingContext.Method.IsStatic || parsingContext.Instruction.OpCode != OpCodes.Ldarg_0 && (int)parsingContext.Instruction.Operand != 0)
             {
-                node = null;
-                consumedInstructions = 0;
                 return false;
             }
 
-            var isStruct = method.DeclaringType.IsValueType;
+            var isStruct = parsingContext.Method.DeclaringType.IsValueType;
+
+            int consumedInstructions;
 
             if (isStruct)
             {
-                if (instruction.Next?.OpCode == OpCodes.Ldobj)
+                if (parsingContext.Instruction.Next?.OpCode == OpCodes.Ldobj)
                 {
                     consumedInstructions = 2;
                 }
                 else
                 {
-                    node = null;
-                    consumedInstructions = 0;
                     return false;
                 }
             }
@@ -41,8 +39,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 consumedInstructions = 1;
             }
 
-            node = new ThisNode(method.DeclaringType);
-            return true;
+            return parsingContext.Success(new ThisNode(parsingContext.Method.DeclaringType), consumedInstructions);
         }
     }
 }

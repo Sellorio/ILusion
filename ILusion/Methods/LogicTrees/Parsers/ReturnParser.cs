@@ -22,58 +22,50 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Ret
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
             // SyntaxTree.FromMethodDefintion will only allow this to happen if a genuine return (i.e. value followed by OpCode.Ret) is present.
-            if (instruction.OpCode == OpCodes.Ret)
+            if (parsingContext.Instruction.OpCode == OpCodes.Ret)
             {
-                var returnValue = ParsingHelper.GetValueNodes(nodeStack, 1, out var children)[0];
-                node = new ReturnNode(returnValue, children);
-                consumedInstructions = 1;
-                return true;
+                var returnValue = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 1, out var children)[0];
+                return parsingContext.Success(new ReturnNode(returnValue, children));
             }
-            else if (instruction.OpCode == OpCodes.Br || instruction.OpCode == OpCodes.Br_S)
+            else if (parsingContext.Instruction.OpCode == OpCodes.Br || parsingContext.Instruction.OpCode == OpCodes.Br_S)
             {
                 // no return type
                 // branch is targetting the last (OpCode.Ret) instruction
-                if (method.ReturnType.FullName == typeof(void).FullName
-                    && instruction.Operand == method.Body.Instructions.Last())
+                if (parsingContext.Method.ReturnType.FullName == typeof(void).FullName
+                    && parsingContext.Instruction.Operand == parsingContext.Method.Body.Instructions.Last())
                 {
-                    node = new ReturnNode(null, Enumerable.Empty<LogicNode>());
-                    consumedInstructions = 1;
-                    return true;
+                    return parsingContext.Success(new ReturnNode(null, Enumerable.Empty<LogicNode>()));
                 }
             }
             else
             {
-                if (method.ReturnType.FullName != typeof(void).FullName)
+                if (parsingContext.Method.ReturnType.FullName != typeof(void).FullName)
                 {
-                    var loadReturnValueInstruction = method.Body.Instructions[method.Body.Instructions.Count - 2];
+                    var loadReturnValueInstruction = parsingContext.Method.Body.Instructions[parsingContext.Method.Body.Instructions.Count - 2];
 
                     // branch after setting local
                     // branch is targeting the return part of the method
                     // the local loaded in the return part is the same as the one that was set
-                    if (instruction.Next.OpCode.ToString().StartsWith("br")
-                        && instruction.Next.Operand == loadReturnValueInstruction
-                        && loadReturnValueInstruction.OpCode.ToString() == "ld" + instruction.OpCode.ToString().Substring(2)
-                        && loadReturnValueInstruction.Operand == instruction.Operand)
+                    if (parsingContext.Instruction.Next.OpCode.ToString().StartsWith("br")
+                        && parsingContext.Instruction.Next.Operand == loadReturnValueInstruction
+                        && loadReturnValueInstruction.OpCode.ToString() == "ld" + parsingContext.Instruction.OpCode.ToString().Substring(2)
+                        && loadReturnValueInstruction.Operand == parsingContext.Instruction.Operand)
                     {
-                        var returnValue = ParsingHelper.GetValueNodes(nodeStack, 1, out var children)[0];
+                        var returnValue = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 1, out var children)[0];
 
-                        if (method.ReturnType.FullName == typeof(bool).FullName)
+                        if (parsingContext.Method.ReturnType.FullName == typeof(bool).FullName)
                         {
-                            ParsingHelper.HandleBooleanLiteral(method, returnValue);
+                            ParsingHelper.HandleBooleanLiteral(parsingContext.Method, returnValue);
                         }
 
-                        node = new ReturnNode(returnValue, children);
-                        consumedInstructions = 2;
-                        return true;
+                        return parsingContext.Success(new ReturnNode(returnValue, children), 2);
                     }
                 }
             }
 
-            node = null;
-            consumedInstructions = 0;
             return false;
         }
     }

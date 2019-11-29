@@ -29,60 +29,51 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Ldnull
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            consumedInstructions = 1;
-
-            switch (instruction.OpCode.Code)
+            switch (parsingContext.Instruction.OpCode.Code)
             {
                 case Code.Ldc_I4_S:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), (int)(sbyte)instruction.Operand);
-                    break;
+                    return
+                        parsingContext.Success(
+                            new LiteralNode(
+                                parsingContext.Method.Module.ImportReference(typeof(int)),
+                                (int)(sbyte)parsingContext.Instruction.Operand));
                 case Code.Ldc_I4:
                 case Code.Ldc_I8:
                 case Code.Ldc_R4:
                 case Code.Ldc_R8:
                 case Code.Ldstr:
-                    node = new LiteralNode(method.Module.ImportReference(instruction.Operand.GetType()), instruction.Operand);
-                    break;
+                    return
+                        parsingContext.Success(
+                            new LiteralNode(
+                                parsingContext.Method.Module.ImportReference(parsingContext.Instruction.Operand.GetType()),
+                                parsingContext.Instruction.Operand));
                 case Code.Ldc_I4_0:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 0);
-                    break;
+                    return parsingContext.Success(new LiteralNode(parsingContext.Method.Module.ImportReference(typeof(int)), 0));
                 case Code.Ldc_I4_1:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 1);
-                    break;
+                    return parsingContext.Success(new LiteralNode(parsingContext.Method.Module.ImportReference(typeof(int)), 1));
                 case Code.Ldc_I4_2:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 2);
-                    break;
+                    return parsingContext.Success(new LiteralNode(parsingContext.Method.Module.ImportReference(typeof(int)), 2));
                 case Code.Ldc_I4_3:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 3);
-                    break;
+                    return parsingContext.Success(new LiteralNode(parsingContext.Method.Module.ImportReference(typeof(int)), 3));
                 case Code.Ldc_I4_4:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 4);
-                    break;
+                    return parsingContext.Success(new LiteralNode(parsingContext.Method.Module.ImportReference(typeof(int)), 4));
                 case Code.Ldc_I4_5:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 5);
-                    break;
+                    return parsingContext.Success(new LiteralNode(parsingContext.Method.Module.ImportReference(typeof(int)), 5));
                 case Code.Ldc_I4_6:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 6);
-                    break;
+                    return parsingContext.Success(new LiteralNode(parsingContext.Method.Module.ImportReference(typeof(int)), 6));
                 case Code.Ldc_I4_7:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 7);
-                    break;
+                    return parsingContext.Success(new LiteralNode(parsingContext.Method.Module.ImportReference(typeof(int)), 7));
                 case Code.Ldc_I4_8:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), 8);
-                    break;
+                    return parsingContext.Success(new LiteralNode(parsingContext.Method.Module.ImportReference(typeof(int)), 8));
                 case Code.Ldc_I4_M1:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(int)), -1);
-                    break;
+                    return parsingContext.Success(new LiteralNode(parsingContext.Method.Module.ImportReference(typeof(int)), -1));
                 case Code.Ldnull:
-                    node = new LiteralNode(method.Module.ImportReference(typeof(object)), null);
-                    break;
+                    return parsingContext.Success(new LiteralNode(parsingContext.Method.Module.ImportReference(typeof(object)), null));
                 default:
                     throw new NotSupportedException("Internal Error: unexpected OpCode in parser.");
             }
-
-            return true;
         }
     }
 }

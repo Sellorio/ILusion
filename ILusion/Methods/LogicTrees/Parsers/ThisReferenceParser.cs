@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using ILusion.Methods.LogicTrees.Nodes;
-using Mono.Cecil;
+﻿using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil.Cil;
 
 namespace ILusion.Methods.LogicTrees.Parsers
@@ -14,20 +12,16 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Ldarg_0
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            if (instruction.OpCode == OpCodes.Ldarg_0 && !method.DeclaringType.IsValueType && instruction.Next?.OpCode != OpCodes.Ldobj
-                || method.IsStatic
-                || instruction.Operand != null && (int)instruction.Operand != 0)
+            if (parsingContext.Instruction.OpCode == OpCodes.Ldarg_0 && !parsingContext.Method.DeclaringType.IsValueType && parsingContext.Instruction.Next?.OpCode != OpCodes.Ldobj
+                || parsingContext.Method.IsStatic
+                || parsingContext.Instruction.Operand != null && (int)parsingContext.Instruction.Operand != 0)
             {
-                node = null;
-                consumedInstructions = 0;
                 return false;
             }
 
-            node = new ThisReferenceNode(method.DeclaringType);
-            consumedInstructions = 1;
-            return true;
+            return parsingContext.Success(new ThisReferenceNode(parsingContext.Method.DeclaringType));
         }
     }
 }

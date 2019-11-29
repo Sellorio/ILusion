@@ -13,12 +13,10 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Ldelema
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            var valueNodes = ParsingHelper.GetValueNodes(nodeStack, 2, out var children);
-            node = new ArrayElementReferenceNode(valueNodes[0], valueNodes[1], children);
-            consumedInstructions = 1;
-            return true;
+            var valueNodes = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 2, out var children);
+            return parsingContext.Success(new ArrayElementReferenceNode(valueNodes[0], valueNodes[1], children));
         }
     }
 }

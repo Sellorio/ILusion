@@ -24,12 +24,10 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Ldelem_U4
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            var valueNodes = ParsingHelper.GetValueNodes(nodeStack, 2, out var children);
-            node = new ArrayElementNode(valueNodes[0], valueNodes[1], children);
-            consumedInstructions = 1;
-            return true;
+            var valueNodes = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 2, out var children);
+            return parsingContext.Success(new ArrayElementNode(valueNodes[0], valueNodes[1], children));
         }
     }
 }

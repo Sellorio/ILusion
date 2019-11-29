@@ -16,26 +16,24 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Call
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
             MethodDefinition constructor = null;
             var parameterCount = 0;
 
-            if (instruction.OpCode == OpCodes.Call)
+            if (parsingContext.Instruction.OpCode == OpCodes.Call)
             {
-                constructor = ((MethodReference)instruction.Operand).Resolve();
+                constructor = ((MethodReference)parsingContext.Instruction.Operand).Resolve();
 
                 if (constructor == null || !constructor.IsConstructor)
                 {
-                    node = null;
-                    consumedInstructions = 0;
                     return false;
                 }
 
                 parameterCount = constructor.Parameters.Count;
             }
 
-            var valueNodes = ParsingHelper.GetValueNodes(nodeStack, parameterCount + 1, out var children);
+            var valueNodes = ParsingHelper.GetValueNodes(parsingContext.NodeStack, parameterCount + 1, out var children);
             var target = valueNodes[0];
 
             if (!(target is ReferenceValueNode))
@@ -43,9 +41,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 throw new ParsingException("Initialize target was expected to be an address/reference.");
             }
 
-            node = new InitializeNode((ReferenceValueNode)target, valueNodes.Skip(1), constructor, children);
-            consumedInstructions = 1;
-            return true;
+            return parsingContext.Success(new InitializeNode((ReferenceValueNode)target, valueNodes.Skip(1), constructor, children));
         }
     }
 }

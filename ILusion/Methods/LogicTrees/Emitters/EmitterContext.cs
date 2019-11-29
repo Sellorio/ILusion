@@ -9,15 +9,14 @@ namespace ILusion.Methods.LogicTrees.Emitters
     internal class EmitterContext<TNode>
         where TNode : LogicNode
     {
-        private readonly Dictionary<Instruction, LogicNode> _instructionToNodeMapping;
-
-        public MethodDefinition Target { get; }
-        public TNode Node { get; }
-        public VariableDefinition ReturnVariable { get; }
+        internal Dictionary<Instruction, LogicNode> InstructionToNodeMapping { get; }
+        internal MethodDefinition Target { get; }
+        internal TNode Node { get; }
+        internal VariableDefinition ReturnVariable { get; }
 
         internal EmitterContext(Dictionary<Instruction, LogicNode> instructionToNodeMapping, MethodDefinition target, TNode node, VariableDefinition returnVariable)
         {
-            _instructionToNodeMapping = instructionToNodeMapping;
+            InstructionToNodeMapping = instructionToNodeMapping;
             Target = target;
             Node = node;
             ReturnVariable = returnVariable;
@@ -115,11 +114,6 @@ namespace ILusion.Methods.LogicTrees.Emitters
         /// <returns></returns>
         public EmitterContext<TNode> EmitBranch(OpCode opCode)
         {
-            if (!typeof(BranchNode).IsAssignableFrom(typeof(TNode)) && typeof(TNode) != typeof(ReturnNode))
-            {
-                throw new EmissionException("Can only emit branch instruction from a BranchNode and ReturnNode.");
-            }
-
             if (Target.Body.Instructions.Count == 0)
             {
                 throw new EmissionException("A branch cannot be the first instruction in a method.");
@@ -131,7 +125,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
         private EmitterContext<TNode> Add(Instruction instruction)
         {
             Target.Body.Instructions.Add(instruction);
-            _instructionToNodeMapping.Add(instruction, Node);
+            InstructionToNodeMapping.Add(instruction, Node);
             return this;
         }
     }

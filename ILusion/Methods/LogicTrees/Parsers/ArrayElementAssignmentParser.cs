@@ -21,18 +21,16 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Stelem_Ref
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            var valueNodes = ParsingHelper.GetValueNodes(nodeStack, 3, out var children);
+            var valueNodes = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 3, out var children);
 
             if (((ArrayType)valueNodes[0].GetValueType()).ElementType.FullName == typeof(bool).FullName)
             {
-                ParsingHelper.HandleBooleanLiteral(method, valueNodes[2]);
+                ParsingHelper.HandleBooleanLiteral(parsingContext.Method, valueNodes[2]);
             }
 
-            node = new ArrayElementAssignmentNode(valueNodes[0], valueNodes[1], valueNodes[2], children);
-            consumedInstructions = 1;
-            return true;
+            return parsingContext.Success(new ArrayElementAssignmentNode(valueNodes[0], valueNodes[1], valueNodes[2], children));
         }
     }
 }

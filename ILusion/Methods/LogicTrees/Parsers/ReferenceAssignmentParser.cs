@@ -21,18 +21,16 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Stind_Ref
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            var valueNodes = ParsingHelper.GetValueNodes(nodeStack, 2, out var children);
+            var valueNodes = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 2, out var children);
 
             if (!(valueNodes[0] is ReferenceValueNode))
             {
                 throw new ParsingException("Reference Assignment expected reference node on the stack.");
             }
 
-            node = new ReferenceAssignmentNode((ReferenceValueNode)valueNodes[0], valueNodes[1], children);
-            consumedInstructions = 1;
-            return true;
+            return parsingContext.Success(new ReferenceAssignmentNode((ReferenceValueNode)valueNodes[0], valueNodes[1], children));
         }
     }
 }

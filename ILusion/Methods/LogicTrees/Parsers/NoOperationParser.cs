@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ILusion.Methods.LogicTrees.Nodes;
-using Mono.Cecil;
+﻿using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil.Cil;
 
 namespace ILusion.Methods.LogicTrees.Parsers
@@ -14,11 +10,9 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Nop
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            node = new NoOperationNode();
-            consumedInstructions = 1;
-            return true;
+            return parsingContext.Success(new NoOperationNode());
         }
     }
 }

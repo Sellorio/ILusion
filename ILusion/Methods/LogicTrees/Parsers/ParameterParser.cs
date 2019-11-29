@@ -33,52 +33,45 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Ldarg
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            if (instruction.OpCode == OpCodes.Ldarg_0 && !method.IsStatic)
+            if (parsingContext.Instruction.OpCode == OpCodes.Ldarg_0 && !parsingContext.Method.IsStatic)
             {
-                node = null;
-                consumedInstructions = 0;
                 return false;
             }
 
-            consumedInstructions = 1;
-
             ParameterDefinition parameter;
 
-            switch (instruction.OpCode.Code)
+            switch (parsingContext.Instruction.OpCode.Code)
             {
                 case Code.Ldarg_0:
-                    parameter = method.Parameters[0];
+                    parameter = parsingContext.Method.Parameters[0];
                     break;
                 case Code.Ldarg_1:
-                    parameter = method.Parameters[method.IsStatic ? 1 : 0];
+                    parameter = parsingContext.Method.Parameters[parsingContext.Method.IsStatic ? 1 : 0];
                     break;
                 case Code.Ldarg_2:
-                    parameter = method.Parameters[method.IsStatic ? 2 : 1];
+                    parameter = parsingContext.Method.Parameters[parsingContext.Method.IsStatic ? 2 : 1];
                     break;
                 case Code.Ldarg_3:
-                    parameter = method.Parameters[method.IsStatic ? 3 : 2];
+                    parameter = parsingContext.Method.Parameters[parsingContext.Method.IsStatic ? 3 : 2];
                     break;
                 default:
-                    parameter = (ParameterDefinition)instruction.Operand;
+                    parameter = (ParameterDefinition)parsingContext.Instruction.Operand;
                     break;
             }
 
             if (parameter.ParameterType is ByReferenceType byRef)
             {
-                if (!_dereferenceOpCodes.Contains(instruction.Next?.OpCode))
+                if (!_dereferenceOpCodes.Contains(parsingContext.Instruction.Next?.OpCode))
                 {
-                    consumedInstructions = 0;
-                    node = null;
                     return false;
                 }
 
-                consumedInstructions = 2;
+                return parsingContext.Success(new ParameterNode(parameter), 2);
             }
 
-            node = new ParameterNode(parameter);
-            return true;
+            return parsingContext.Success(new ParameterNode(parameter));
         }
     }
 }

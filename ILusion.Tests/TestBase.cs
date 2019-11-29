@@ -5,6 +5,7 @@ using ILusion.Tests.Sample;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Xunit;
@@ -39,7 +40,12 @@ namespace ILusion.Tests
 
         protected void CheckStatements(SyntaxTree syntaxTree, params Action<LogicNode>[] checks)
         {
-            Assert.Collection(syntaxTree.Statements.Where(x => !(x is NoOperationNode)), checks);
+            CheckStatements(syntaxTree.Statements, checks);
+        }
+
+        protected void CheckStatements(IReadOnlyList<LogicNode> statements, params Action<LogicNode>[] checks)
+        {
+            Assert.Collection(statements.Where(x => !(x is NoOperationNode)), checks);
         }
 
         protected TNode CheckNode<TNode>(LogicNode node, params Action<LogicNode>[] childrenChecks)

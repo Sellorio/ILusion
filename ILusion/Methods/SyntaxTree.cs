@@ -17,24 +17,6 @@ namespace ILusion.Methods
 {
     public sealed class SyntaxTree
     {
-        private static readonly IParser[] _parsers =
-            typeof(IParser).Assembly.GetTypes()
-                .Where(x => !x.IsInterface && !x.IsAbstract && x.Namespace == typeof(IParser).Namespace && typeof(IParser).IsAssignableFrom(x))
-                .Select(x => (IParser)Activator.CreateInstance(x))
-                .ToArray();
-
-        private static readonly Dictionary<OpCode, IParser[]> _mappedParsers =
-            _parsers
-                .SelectMany(x => x.CanTryParse.Select(y => new KeyValuePair<OpCode, IParser>(y, x)))
-                .GroupBy(x => x.Key)
-                .ToDictionary(x => x.Key, x => x.Select(y => y.Value).ToArray());
-
-        private static readonly Dictionary<Type, IEmitter> _mappedEmitters =
-            typeof(IEmitter).Assembly.GetTypes()
-                .Where(x => !x.IsInterface && !x.IsAbstract && x.Namespace == typeof(IEmitter).Namespace && typeof(IEmitter).IsAssignableFrom(x))
-                .Select(x => (IEmitter)Activator.CreateInstance(x))
-                .ToDictionary(x => x.SupportedNode, x => x);
-
         internal VariableDefinition ReturnVariable { get; }
         public IReadOnlyList<LogicNode> Statements { get; }
 
@@ -57,7 +39,7 @@ namespace ILusion.Methods
 
             foreach (var statement in Statements)
             {
-                EmitInstructions(instructionToNodeMapping, methodDefinition, statement, returnVariable);
+                EmissionHelper.EmitInstructions(instructionToNodeMapping, methodDefinition, statement, returnVariable);
             }
 
             if (returnVariable != null)
@@ -71,25 +53,11 @@ namespace ILusion.Methods
             }
 
             BranchHelper.UpdateBranchInstructions(instructionToNodeMapping, methodDefinition);
-        }
 
-        private static void EmitInstructions(
-            Dictionary<Instruction, LogicNode> instructionToNodeMapping,
-            MethodDefinition methodDefinition,
-            LogicNode node,
-            VariableDefinition returnVariable)
-        {
-            foreach (var child in node.Children)
+            foreach (var node in instructionToNodeMapping.Values.Distinct())
             {
-                EmitInstructions(instructionToNodeMapping, methodDefinition, child, returnVariable);
+                EmissionHelper.UpdateBranches(instructionToNodeMapping, methodDefinition, node, returnVariable);
             }
-
-            if (!_mappedEmitters.TryGetValue(node.GetType(), out var emitter))
-            {
-                throw new EmissionException($"No emitter found that supports {node.GetType().Name}.");
-            }
-
-            emitter.Emit(instructionToNodeMapping, methodDefinition, node, returnVariable);
         }
 
         public static SyntaxTree FromMethodDefinition(MethodDefinition methodDefinition)
@@ -115,33 +83,7 @@ namespace ILusion.Methods
 
             while (methodDefinition.Body.Instructions.Count - trimmedInstructions > instructionIndex)
             {
-                var instruction = methodDefinition.Body.Instructions[instructionIndex];
-
-                if (!_mappedParsers.TryGetValue(instruction.OpCode, out var parsers))
-                {
-                    throw new ParsingException("OpCode " + instruction.OpCode + " is not supported by any parsers.");
-                }
-
-                var instructionParsed = false;
-
-                foreach (var parser in parsers)
-                {
-                    var successful = parser.TryParse(methodDefinition, instruction, nodeStack, out var node, out var consumedInstructions);
-                    
-                    if (successful)
-                    {
-                        instructionToNodeMapping.Add(instruction, node);
-                        nodeStack.Push(node);
-                        instructionParsed = true;
-                        instructionIndex += consumedInstructions;
-                        break;
-                    }
-                }
-
-                if (!instructionParsed)
-                {
-                    throw new ParsingException($"Failed to parse instruction ({instruction}).");
-                }
+                ParsingHelper.ParseInstruction(methodDefinition, ref instructionIndex, instructionToNodeMapping, nodeStack);
             }
 
             foreach (var branch in instructionToNodeMapping.Values.OfType<BranchNode>())

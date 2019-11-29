@@ -18,33 +18,30 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Ldloc_3
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            consumedInstructions = 1;
-
             VariableDefinition variable;
 
-            switch (instruction.OpCode.Code)
+            switch (parsingContext.Instruction.OpCode.Code)
             {
                 case Code.Ldloc_0:
-                    variable = method.Body.Variables[0];
+                    variable = parsingContext.Method.Body.Variables[0];
                     break;
                 case Code.Ldloc_1:
-                    variable = method.Body.Variables[1];
+                    variable = parsingContext.Method.Body.Variables[1];
                     break;
                 case Code.Ldloc_2:
-                    variable = method.Body.Variables[2];
+                    variable = parsingContext.Method.Body.Variables[2];
                     break;
                 case Code.Ldloc_3:
-                    variable = method.Body.Variables[3];
+                    variable = parsingContext.Method.Body.Variables[3];
                     break;
                 default:
-                    variable = (VariableDefinition)instruction.Operand;
+                    variable = (VariableDefinition)parsingContext.Instruction.Operand;
                     break;
             }
 
-            node = new VariableNode(variable);
-            return true;
+            return parsingContext.Success(new VariableNode(variable));
         }
     }
 }

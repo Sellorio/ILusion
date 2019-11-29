@@ -13,15 +13,15 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Isinst
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            var nextInstruction = instruction.Next;
+            var nextInstruction = parsingContext.Instruction.Next;
             var nextNextInstruction = nextInstruction?.Next;
 
             // skip set-load which may be for an Is expression with variable or it may be used in an If statement
             if ((nextInstruction?.OpCode.ToString().StartsWith("stloc") ?? false)
                 && (nextNextInstruction?.OpCode.ToString().StartsWith("ldloc") ?? false)
-                && VariableHelper.GetVariableFromInstruction(method, nextInstruction) == VariableHelper.GetVariableFromInstruction(method, nextNextInstruction))
+                && VariableHelper.GetVariableFromInstruction(parsingContext.Method, nextInstruction) == VariableHelper.GetVariableFromInstruction(parsingContext.Method, nextNextInstruction))
             {
                 nextInstruction = nextNextInstruction.Next;
                 nextNextInstruction = nextInstruction?.Next;
@@ -33,15 +33,11 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 || nextInstruction?.OpCode == OpCodes.Brtrue_S
                 || nextInstruction?.OpCode == OpCodes.Ldnull && nextNextInstruction?.OpCode == OpCodes.Cgt_Un)
             {
-                node = null;
-                consumedInstructions = 0;
                 return false;
             }
 
-            var value = ParsingHelper.GetValueNodes(nodeStack, 1, out var children)[0];
-            node = new AsNode(value, (TypeReference)instruction.Operand, children);
-            consumedInstructions = 1;
-            return true;
+            var value = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 1, out var children)[0];
+            return parsingContext.Success(new AsNode(value, (TypeReference)parsingContext.Instruction.Operand, children));
         }
     }
 }

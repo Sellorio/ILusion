@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using ILusion.Exceptions;
+﻿using ILusion.Exceptions;
 using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
-using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace ILusion.Methods.LogicTrees.Parsers
@@ -14,13 +12,13 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Ldlen
         };
 
-        public bool TryParse(MethodDefinition method, Instruction instruction, Stack<LogicNode> nodeStack, out LogicNode node, out int consumedInstructions)
+        public bool TryParse(ParsingContext parsingContext)
         {
-            var array = ParsingHelper.GetValueNodes(nodeStack, 1, out var children)[0];
+            var array = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 1, out var children)[0];
 
             bool asLong;
 
-            switch (instruction.Next.OpCode.Code)
+            switch (parsingContext.Instruction.Next.OpCode.Code)
             {
                 case Code.Conv_I4:
                     asLong = false;
@@ -32,9 +30,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
                     throw new ParsingException("Expected a cast/conversion immediately following ldlen operation.");
             }
 
-            node = new ArrayLengthNode(method.Module.ImportReference(typeof(int)), array, asLong, children);
-            consumedInstructions = 2;
-            return true;
+            return parsingContext.Success(new ArrayLengthNode(parsingContext.Method.Module.ImportReference(typeof(int)), array, asLong, children), 2);
         }
     }
 }
