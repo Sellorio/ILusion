@@ -16,6 +16,13 @@ namespace ILusion.Methods.LogicTrees.Helpers
                 .Select(x => (IEmitter)Activator.CreateInstance(x))
                 .ToDictionary(x => x.SupportedNode, x => x);
 
+        private static readonly Dictionary<OpCode, OpCode> LongToShort = new Dictionary<OpCode, OpCode>
+        {
+            { OpCodes.Br, OpCodes.Br_S },
+            { OpCodes.Brfalse, OpCodes.Brfalse_S },
+            { OpCodes.Brtrue, OpCodes.Brtrue_S }
+        };
+
         internal static void EmitInstructions(
             Dictionary<Instruction, LogicNode> instructionToNodeMapping,
             MethodDefinition methodDefinition,
@@ -47,6 +54,81 @@ namespace ILusion.Methods.LogicTrees.Helpers
             }
 
             emitter.UpdateBranches(instructionToNodeMapping, methodDefinition, node, returnVariable);
+        }
+
+        internal static void ComputeOffsets(MethodDefinition method)
+        {
+            ComputeOffsets(method.Body.Instructions[0]);
+
+            foreach (var branch in method.Body.Instructions.Where(x => LongToShort.ContainsKey(x.OpCode)))
+            {
+                var target = (Instruction)branch.Operand;
+
+                // 3 is the difference of 5 - 2 (br vs br.s offset)
+                if (target.Offset <= 255 + 3)
+                {
+                    branch.OpCode = LongToShort[branch.OpCode];
+                }
+
+                ComputeOffsets(branch.Next);
+            }
+        }
+
+        private static void ComputeOffsets(Instruction startFrom)
+        {
+            while (startFrom != null)
+            {
+                UpdateOffset(startFrom);
+                startFrom = startFrom.Next;
+            }
+        }
+
+        private static void UpdateOffset(Instruction instruction)
+        {
+            if (instruction.Previous == null)
+            {
+                instruction.Offset = 0;
+                return;
+            }
+
+            var opCodeSize = 1;
+
+            switch (instruction.Previous.OpCode.Code)
+            {
+                case Code.Constrained:
+                case Code.Initobj:
+                case Code.Ceq:
+                case Code.Cgt:
+                case Code.Cgt_Un:
+                case Code.Ckfinite:
+                case Code.Clt:
+                case Code.Clt_Un:
+                    opCodeSize = 2;
+                    break;
+            }
+
+            int operandSize;
+
+            if (instruction.Previous.Operand == null)
+            {
+                operandSize = 0;
+            }
+            else if (instruction.Previous.OpCode.ToString().EndsWith(".s"))
+            {
+                operandSize = 1;
+            }
+            else if (
+                instruction.Previous.OpCode == OpCodes.Ldc_I8
+                || instruction.Previous.OpCode == OpCodes.Ldc_R8)
+            {
+                operandSize = 8;
+            }
+            else
+            {
+                operandSize = 4;
+            }
+
+            instruction.Offset = instruction.Previous.Offset + opCodeSize + operandSize;
         }
     }
 }

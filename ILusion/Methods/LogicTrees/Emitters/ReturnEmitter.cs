@@ -1,6 +1,7 @@
 ﻿using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil.Cil;
+using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Emitters
 {
@@ -31,6 +32,19 @@ namespace ILusion.Methods.LogicTrees.Emitters
             }
 
             emitterContext.EmitBranch(OpCodes.Br);
+        }
+
+        protected override void UpdateBranches(EmitterContext<ReturnNode> emitterContext)
+        {
+            var instruction = emitterContext.InstructionToNodeMapping.Last(x => x.Value == emitterContext.Node).Key;
+
+            if (instruction.OpCode != OpCodes.Ret)
+            {
+                var isFunction = emitterContext.Target.ReturnType.FullName != typeof(void).FullName;
+                var targetInstruction = emitterContext.Target.Body.Instructions[emitterContext.Target.Body.Instructions.Count - (isFunction ? 2 : 1)];
+
+                instruction.Operand = targetInstruction;
+            }
         }
     }
 }

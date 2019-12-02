@@ -34,7 +34,7 @@ namespace ILusion.Tests
             
             for (var i = 0; i < oldInstructions.Length; i++)
             {
-                AssertInstructions(oldInstructions[i], newInstructions[i]);
+                Assert.Equal(oldInstructions[i].ToString(), newInstructions[i].ToString());
             }
         }
 
@@ -59,20 +59,6 @@ namespace ILusion.Tests
         protected ValueNode NthValueChild(LogicNode node, int index)
         {
             return node.Children.OfType<ValueNode>().ElementAt(index);
-        }
-
-        private static void AssertInstructions(Instruction expected, Instruction actual)
-        {
-            Assert.Equal(expected.OpCode, actual.OpCode);
-
-            if (expected.Operand is Instruction expectedInstruction && actual.Operand is Instruction actualInstruction)
-            {
-                AssertInstructions(expectedInstruction, actualInstruction);
-            }
-            else
-            {
-                Assert.Equal(expected.Operand?.ToString(), actual.Operand?.ToString());
-            }
         }
     }
 }

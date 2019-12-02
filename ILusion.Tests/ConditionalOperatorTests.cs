@@ -47,5 +47,103 @@ namespace ILusion.Tests
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
+
+        [Fact]
+        public void CommonValues() 
+        {
+            var sampleMethod = GetSampleMethod(nameof(ConditionalOperatorSamples), nameof(ConditionalOperatorSamples.CommonValues));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<ReturnNode>(x,
+                    y =>
+                    {
+                        var op =
+                            CheckNode<ConditionalOperatorNode>(y,
+                                z => CheckNode<ParameterNode>(z));
+
+                        Assert.Same(NthValueChild(y, 0), op.Condition);
+                        Assert.Equal("System.String", op.GetValueType()?.FullName);
+
+                        CheckStatements(
+                            op.TrueExpression,
+                            z => CheckNode<FunctionCallNode>(z,
+                                a => CheckNode<LiteralNode>(a),
+                                a => CheckNode<LiteralNode>(a)));
+
+                        CheckStatements(
+                            op.FalseExpression,
+                            z => CheckNode<FunctionCallNode>(z,
+                                a => CheckNode<LiteralNode>(a),
+                                a => CheckNode<LiteralNode>(a)));
+                    }));
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+
+        [Fact]
+        public void NullTrueExpression()
+        {
+            var sampleMethod = GetSampleMethod(nameof(ConditionalOperatorSamples), nameof(ConditionalOperatorSamples.NullTrueExpression));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<ReturnNode>(x,
+                    y =>
+                    {
+                        var op =
+                            CheckNode<ConditionalOperatorNode>(y,
+                                z => CheckNode<ParameterNode>(z));
+
+                        Assert.Same(NthValueChild(y, 0), op.Condition);
+                        Assert.Equal("System.String", op.GetValueType()?.FullName);
+
+                        CheckStatements(
+                            op.TrueExpression,
+                            z => CheckNode<LiteralNode>(z));
+
+                        CheckStatements(
+                            op.FalseExpression,
+                            z => CheckNode<FunctionCallNode>(z,
+                                a => CheckNode<LiteralNode>(a),
+                                a => CheckNode<LiteralNode>(a)));
+                    }));
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+
+        [Fact]
+        public void NullFalseExpression()
+        {
+            var sampleMethod = GetSampleMethod(nameof(ConditionalOperatorSamples), nameof(ConditionalOperatorSamples.NullFalseExpression));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<ReturnNode>(x,
+                    y =>
+                    {
+                        var op =
+                            CheckNode<ConditionalOperatorNode>(y,
+                                z => CheckNode<ParameterNode>(z));
+
+                        Assert.Same(NthValueChild(y, 0), op.Condition);
+                        Assert.Equal("System.String", op.GetValueType()?.FullName);
+
+                        CheckStatements(
+                            op.TrueExpression,
+                            z => CheckNode<FunctionCallNode>(z,
+                                a => CheckNode<LiteralNode>(a),
+                                a => CheckNode<LiteralNode>(a)));
+
+                        CheckStatements(
+                            op.FalseExpression,
+                            z => CheckNode<LiteralNode>(z));
+                    }));
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
     }
 }

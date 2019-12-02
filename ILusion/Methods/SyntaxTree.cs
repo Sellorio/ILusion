@@ -52,12 +52,12 @@ namespace ILusion.Methods
                 methodDefinition.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
             }
 
-            BranchHelper.UpdateBranchInstructions(instructionToNodeMapping, methodDefinition);
-
             foreach (var node in instructionToNodeMapping.Values.Distinct())
             {
                 EmissionHelper.UpdateBranches(instructionToNodeMapping, methodDefinition, node, returnVariable);
             }
+
+            EmissionHelper.ComputeOffsets(methodDefinition);
         }
 
         public static SyntaxTree FromMethodDefinition(MethodDefinition methodDefinition)

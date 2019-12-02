@@ -28,28 +28,6 @@ namespace ILusion.Methods.LogicTrees.Helpers
             { OpCodes.Brtrue_S, OpCodes.Brtrue_S }
         };
 
-        internal static void UpdateBranchInstructions(Dictionary<Instruction, LogicNode> instructionToNodeMapping, MethodDefinition methodDefinition)
-        {
-            var firstInstruction = methodDefinition.Body.Instructions[0];
-
-            foreach (var instruction in methodDefinition.Body.Instructions.Where(x => x.Operand == firstInstruction))
-            {
-                var node = instructionToNodeMapping[instruction];
-
-                if (node is BranchNode branchNode)
-                {
-                    var targetInstruction = instructionToNodeMapping.First(x => x.Value == branchNode.Target).Key;
-                    UpdateBranchTarget(instruction, targetInstruction);
-                }
-                else if (node is ReturnNode)
-                {
-                    var isFunction = methodDefinition.ReturnType.FullName != typeof(void).FullName;
-                    var targetInstruction = methodDefinition.Body.Instructions[methodDefinition.Body.Instructions.Count - (isFunction ? 2 : 1)];
-                    UpdateBranchTarget(instruction, targetInstruction);
-                }
-            }
-        }
-
         internal static void UpdateBranchOpCode(Instruction branch)
         {
             if (((Instruction)branch.Operand).Offset > 255)
@@ -60,12 +38,6 @@ namespace ILusion.Methods.LogicTrees.Helpers
             {
                 branch.OpCode = LongToShort[branch.OpCode];
             }
-        }
-
-        private static void UpdateBranchTarget(Instruction branch, Instruction target)
-        {
-            branch.Operand = target;
-            UpdateBranchOpCode(branch);
         }
     }
 }

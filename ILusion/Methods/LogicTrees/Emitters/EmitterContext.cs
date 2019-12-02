@@ -3,6 +3,7 @@ using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Emitters
 {

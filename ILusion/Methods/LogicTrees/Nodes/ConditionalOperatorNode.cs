@@ -25,7 +25,14 @@ namespace ILusion.Methods.LogicTrees.Nodes
 
         internal override TypeReference GetValueType()
         {
-            return TrueExpression.OfType<ValueNode>().Single().GetValueType();
+            var trueExpression = TrueExpression.OfType<ValueNode>().Single();
+
+            if (trueExpression is LiteralNode literal && literal.Value == null)
+            {
+                return FalseExpression.OfType<ValueNode>().Single().GetValueType();
+            }
+
+            return trueExpression.GetValueType();
         }
     }
 }
