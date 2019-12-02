@@ -17,15 +17,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
         {
             var targetInstruction = (Instruction)parsingContext.Instruction.Operand;
 
-            // this is a do-while loop
-            if (targetInstruction.Offset < parsingContext.Instruction.Offset)
-            {
-                return false;
-            }
-
-            var condition = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 1, out var children)[0];
-            var conditionStartNode = NodeHelper.GetFirstRecursively(condition);
-            var conditionStartInstruction = parsingContext.InstructionToNodeMapping.First(x => x.Value == conditionStartNode);
+            var condition = ParsingHelper.ParseConditionalNodeCondition(parsingContext.NodeStack, out var conditionResultVariable, out var children);
 
             var trueInstruction = parsingContext.Instruction.Next;
             var trueEndInstruction = targetInstruction;
@@ -34,12 +26,6 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
             if (targetInstruction.Previous.OpCode == OpCodes.Br || targetInstruction.Previous.OpCode == OpCodes.Br_S)
             {
-                // while loop
-                if (targetInstruction.Previous.Operand == conditionStartInstruction.Key)
-                {
-                    return false;
-                }
-
                 trueEndInstruction = targetInstruction.Previous;
                 falseInstruction = targetInstruction;
                 endInstruction = (Instruction)targetInstruction.Previous.Operand;
@@ -50,7 +36,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
             var consumedInstructions = parsingContext.Method.Body.Instructions.Count(x => x.Offset >= parsingContext.Instruction.Offset && x.Offset < endInstruction.Offset);
 
-            return parsingContext.Success(new IfNode(condition, trueBlock, falseBlock, children), consumedInstructions);
+            return parsingContext.Success(new IfNode(condition, conditionResultVariable, trueBlock, falseBlock, children), consumedInstructions);
         }
     }
 }

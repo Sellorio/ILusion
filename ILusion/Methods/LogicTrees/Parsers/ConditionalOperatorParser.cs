@@ -17,7 +17,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
         {
             var targetInstruction = (Instruction)parsingContext.Instruction.Operand;
 
-            // this is a do-while loop
+            // this is a loop of some sort
             if (targetInstruction.Offset < parsingContext.Instruction.Offset)
             {
                 return false;

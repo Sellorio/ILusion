@@ -1,7 +1,6 @@
 ﻿using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil.Cil;
-using System;
 using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Emitters
@@ -10,6 +9,14 @@ namespace ILusion.Methods.LogicTrees.Emitters
     {
         protected override void Emit(EmitterContext<IfNode> emitterContext)
         {
+            if (emitterContext.Node.ConditionResultVariable != null)
+            {
+                emitterContext.Target.Body.Instructions.Add(
+                    VariableHelper.CreateSetVariableInstruction(emitterContext.Node.ConditionResultVariable));
+                emitterContext.Target.Body.Instructions.Add(
+                    VariableHelper.CreateLoadVariableInstruction(emitterContext.Node.ConditionResultVariable));
+            }
+
             emitterContext.EmitBranch(OpCodes.Brfalse);
             var toFalseOrEnd = emitterContext.Target.Body.Instructions.Last();
 

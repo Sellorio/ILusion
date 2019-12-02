@@ -15,13 +15,11 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
-                    y => CheckNode<ParameterNode>(y)),
                 x =>
                 {
                     var ifNode =
                         CheckNode<IfNode>(x,
-                            y => CheckNode<VariableNode>(y));
+                            y => CheckNode<ParameterNode>(y));
 
                     Assert.Null(ifNode.FalseStatements);
                     Assert.Same(NthValueChild(x, 0), ifNode.Condition);
@@ -42,13 +40,11 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
-                    y => CheckNode<ParameterNode>(y)),
                 x =>
                 {
                     var ifNode =
                         CheckNode<IfNode>(x,
-                            y => CheckNode<VariableNode>(y));
+                            y => CheckNode<ParameterNode>(y));
 
                     Assert.Same(NthValueChild(x, 0), ifNode.Condition);
                     CheckStatements(
@@ -72,14 +68,12 @@ namespace ILusion.Tests
 
             CheckStatements(
                 syntaxTree,
-                x => CheckNode<VariableAssignmentNode>(x,
-                    y => CheckNode<NotNode>(y,    
-                        z => CheckNode<ParameterNode>(z))),
                 x =>
                 {
                     var ifNode =
                         CheckNode<IfNode>(x,
-                            y => CheckNode<VariableNode>(y));
+                            y => CheckNode<NotNode>(y,
+                                z => CheckNode<ParameterNode>(z)));
 
                     Assert.Same(NthValueChild(x, 0), ifNode.Condition);
                     CheckStatements(

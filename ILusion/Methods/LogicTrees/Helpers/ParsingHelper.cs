@@ -23,7 +23,7 @@ namespace ILusion.Methods.LogicTrees.Helpers
                 .GroupBy(x => x.Key)
                 .ToDictionary(x => x.Key, x => x.Select(y => y.Value).ToArray());
 
-        internal static ValueNode[] GetValueNodes(Stack<LogicNode> nodeStack, int count, out LogicNode[] nodes, bool popNodes = true)
+        internal static ValueNode[] GetValueNodes(Stack<LogicNode> nodeStack, int count, out IReadOnlyList<LogicNode> nodes, bool popNodes = true)
         {
             if (count == 0)
             {
@@ -124,6 +124,28 @@ namespace ILusion.Methods.LogicTrees.Helpers
             {
                 throw new ParsingException($"Failed to parse instruction ({instruction}).");
             }
+        }
+
+        internal static ValueNode ParseConditionalNodeCondition(
+            Stack<LogicNode> nodeStack,
+            out VariableDefinition conditionResultVariable,
+            out IReadOnlyList<LogicNode> nodes)
+        {
+            var condition = GetValueNodes(nodeStack, 1, out nodes)[0];
+            conditionResultVariable = null;
+
+            if (nodeStack.Peek() is VariableAssignmentNode variableAssignment
+                && condition is VariableNode variable
+                && variableAssignment.Variable == variable.Variable)
+            {
+                condition = variableAssignment.Value;
+                conditionResultVariable = variable.Variable;
+                nodes = variableAssignment.Children;
+
+                nodeStack.Pop();
+            }
+
+            return condition;
         }
     }
 }

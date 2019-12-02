@@ -2,6 +2,7 @@
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Collections.Generic;
 
 namespace ILusion.Methods.LogicTrees.Parsers
 {
@@ -15,7 +16,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
         public bool TryParse(ParsingContext parsingContext)
         {
-            var children = new LogicNode[0];
+            IReadOnlyList<LogicNode> children = new LogicNode[0];
             var instance = parsingContext.Instruction.OpCode == OpCodes.Ldsfld ? null : ParsingHelper.GetValueNodes(parsingContext.NodeStack, 1, out children)[0];
             return parsingContext.Success(new FieldNode(instance, (FieldReference)parsingContext.Instruction.Operand, children));
         }
