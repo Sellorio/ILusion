@@ -58,6 +58,7 @@ namespace ILusion.Methods
             }
 
             EmissionHelper.ComputeOffsets(methodDefinition);
+            EmissionHelper.TrimReturnIfUnused(methodDefinition);
         }
 
         public static SyntaxTree FromMethodDefinition(MethodDefinition methodDefinition)
@@ -72,7 +73,8 @@ namespace ILusion.Methods
             // this logic supports the 3 variations to return values
             var trimmedInstructions = methodDefinition.ReturnType.FullName == typeof(void).FullName ? 1 : 2;
 
-            if (trimmedInstructions == 2 && VariableHelper.GetReturnVariable(methodDefinition) == null)
+            if (trimmedInstructions == 2 && VariableHelper.GetReturnVariable(methodDefinition) == null
+                || methodDefinition.Body.Instructions.LastOrDefault()?.OpCode != OpCodes.Ret)
             {
                 trimmedInstructions = 0;
             }
@@ -88,6 +90,11 @@ namespace ILusion.Methods
 
             foreach (var branch in instructionToNodeMapping.Values.OfType<BranchNode>())
             {
+                if (branch.OriginalTarget == null)
+                {
+                    continue;
+                }
+
                 if (!instructionToNodeMapping.TryGetValue(branch.OriginalTarget, out var target))
                 {
                     throw new ParsingException("Failed to update branch node to point to a parsed node.");

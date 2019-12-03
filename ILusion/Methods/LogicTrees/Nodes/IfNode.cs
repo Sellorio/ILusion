@@ -6,8 +6,8 @@ namespace ILusion.Methods.LogicTrees.Nodes
 {
     public sealed class IfNode : ConditionalNode
     {
-        public IReadOnlyList<LogicNode> TrueStatements { get; }
-        public IReadOnlyList<LogicNode> FalseStatements { get; }
+        public IReadOnlyList<LogicNode> TrueStatements { get; internal set; }
+        public IReadOnlyList<LogicNode> FalseStatements { get; internal set; }
 
         public IfNode(
             ValueNode condition,

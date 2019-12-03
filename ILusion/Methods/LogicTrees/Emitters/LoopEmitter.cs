@@ -47,11 +47,33 @@ namespace ILusion.Methods.LogicTrees.Emitters
             {
                 emitterContext.Target.Body.Instructions.Add(
                     VariableHelper.CreateSetVariableInstruction(emitterContext.Node.ConditionResultVariable));
-                emitterContext.Target.Body.Instructions.Add(
-                    VariableHelper.CreateLoadVariableInstruction(emitterContext.Node.ConditionResultVariable));
-            }
 
-            emitterContext.Emit(OpCodes.Brtrue, firstStatementInstruction);
+                if (emitterContext.Node.Condition is LiteralNode literal)
+                {
+                    if (true.Equals(literal.Value))
+                    {
+                        emitterContext.Emit(OpCodes.Br, firstStatementInstruction);
+                    }
+                    else if (false.Equals(literal.Value))
+                    {
+                        emitterContext.Emit(OpCodes.Brtrue, firstStatementInstruction);
+                    }
+                    else
+                    {
+                        emitterContext.Emit(OpCodes.Brtrue, firstStatementInstruction);
+                    }
+                }
+                else
+                {
+                    emitterContext.Target.Body.Instructions.Add(
+                        VariableHelper.CreateLoadVariableInstruction(emitterContext.Node.ConditionResultVariable));
+                    emitterContext.Emit(OpCodes.Brtrue, firstStatementInstruction);
+                }
+            }
+            else
+            {
+                emitterContext.Emit(OpCodes.Brtrue, firstStatementInstruction);
+            }
         }
 
         protected override void UpdateBranches(EmitterContext<LoopNode> emitterContext)

@@ -74,6 +74,19 @@ namespace ILusion.Methods.LogicTrees.Helpers
             }
         }
 
+        internal static void TrimReturnIfUnused(MethodDefinition method)
+        {
+            var returnInstruction = method.Body.Instructions.Last();
+
+            // if the return isn't used due to an infinite loop somewhere in the code - only applcable to Actions
+            if (returnInstruction.OpCode == OpCodes.Ret
+                && (returnInstruction.Previous?.OpCode == OpCodes.Br || returnInstruction.Previous?.OpCode == OpCodes.Br_S)
+                && method.Body.Instructions.All(x => x.Operand != returnInstruction))
+            {
+                method.Body.Instructions.Remove(returnInstruction);
+            }
+        }
+
         private static void ComputeOffsets(Instruction startFrom)
         {
             while (startFrom != null)

@@ -26,9 +26,16 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
             if (targetInstruction.Previous.OpCode == OpCodes.Br || targetInstruction.Previous.OpCode == OpCodes.Br_S)
             {
-                trueEndInstruction = targetInstruction.Previous;
-                falseInstruction = targetInstruction;
-                endInstruction = (Instruction)targetInstruction.Previous.Operand;
+                var suspectedEndOfIf = (Instruction)targetInstruction.Previous.Operand;
+
+                if (suspectedEndOfIf.Offset > targetInstruction.Offset
+                    && suspectedEndOfIf.Previous.OpCode != OpCodes.Brtrue
+                    && suspectedEndOfIf.Previous.OpCode != OpCodes.Brtrue_S)
+                {
+                    trueEndInstruction = targetInstruction.Previous;
+                    falseInstruction = targetInstruction;
+                    endInstruction = suspectedEndOfIf;
+                }
             }
 
             var trueBlock = ParsingHelper.ParseBlock(parsingContext.Method, parsingContext.InstructionToNodeMapping, trueInstruction, trueEndInstruction);

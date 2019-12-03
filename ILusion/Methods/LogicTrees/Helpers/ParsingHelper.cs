@@ -131,16 +131,27 @@ namespace ILusion.Methods.LogicTrees.Helpers
             out VariableDefinition conditionResultVariable,
             out IReadOnlyList<LogicNode> nodes)
         {
+            // for While True loops - the syntax is a bit different
+            if (nodeStack.Peek() is VariableAssignmentNode variableAssignment
+                && variableAssignment.Value is LiteralNode literal
+                && true.Equals(literal.Value))
+            {
+                nodeStack.Pop();
+                conditionResultVariable = variableAssignment.Variable;
+                nodes = new[] { literal };
+                return literal;
+            }
+
             var condition = GetValueNodes(nodeStack, 1, out nodes)[0];
             conditionResultVariable = null;
 
-            if (nodeStack.Peek() is VariableAssignmentNode variableAssignment
+            if (nodeStack.Peek() is VariableAssignmentNode variableAssignment2
                 && condition is VariableNode variable
-                && variableAssignment.Variable == variable.Variable)
+                && variableAssignment2.Variable == variable.Variable)
             {
-                condition = variableAssignment.Value;
+                condition = variableAssignment2.Value;
                 conditionResultVariable = variable.Variable;
-                nodes = variableAssignment.Children;
+                nodes = variableAssignment2.Children;
 
                 nodeStack.Pop();
             }
