@@ -55,7 +55,9 @@ namespace ILusion.Tests
                         ifNode.FalseStatements,
                         y => CheckNode<ActionCallNode>(y,
                             z => CheckNode<LiteralNode>(z)));
-                });
+                },
+                x => CheckNode<ActionCallNode>(x,
+                    y => CheckNode<LiteralNode>(y)));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
@@ -84,7 +86,9 @@ namespace ILusion.Tests
                         ifNode.FalseStatements,
                         y => CheckNode<ActionCallNode>(y,
                             z => CheckNode<LiteralNode>(z)));
-                });
+                },
+                x => CheckNode<ActionCallNode>(x,
+                    y => CheckNode<LiteralNode>(y)));
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }

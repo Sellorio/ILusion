@@ -5,6 +5,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Helpers
@@ -157,6 +158,53 @@ namespace ILusion.Methods.LogicTrees.Helpers
             }
 
             return condition;
+        }
+
+        internal static IReadOnlyList<LogicNode> HandleElseBlocks(IReadOnlyList<LogicNode> statements, Dictionary<Instruction, LogicNode> instructionToNodeMapping)
+        {
+            if (!statements.Any(x => x is IfNode || x is LoopNode))
+            {
+                return statements;
+            }
+
+            var result = new List<LogicNode>();
+
+            var goToTargetsSuggestingPresenceOfElse = statements.Select(x => instructionToNodeMapping.First(y => y.Value == NodeHelper.GetFirstRecursively(x)).Key).ToList();
+
+            for (var i = 0; i < statements.Count; i++)
+            {
+                result.Add(statements[i]);
+
+                if (statements[i] is IfNode ifNode)
+                {
+                    ifNode.TrueStatements = HandleElseBlocks(ifNode.TrueStatements, instructionToNodeMapping);
+
+                    if (ifNode.TrueStatements.LastOrDefault() is GoToNode goTo) 
+                    if (goTo.OriginalTarget.Offset > instructionToNodeMapping.First(x => x.Value == goTo).Key.Offset)
+                    if (goToTargetsSuggestingPresenceOfElse.Contains(goTo.OriginalTarget))
+                    {
+                        ifNode.TrueStatements = ImmutableArray.CreateRange(ifNode.TrueStatements.Take(ifNode.TrueStatements.Count - 1));
+                        var afterElseStatement = statements.First(x => instructionToNodeMapping.First(y => y.Value == NodeHelper.GetFirstRecursively(x)).Key == goTo.OriginalTarget);
+                        var elseStatements = new List<LogicNode>();
+
+                        var j = i + 1;
+
+                        for (; statements[j] != afterElseStatement; j++)
+                        {
+                            elseStatements.Add(statements[j]);
+                        }
+
+                        i = j - 1;
+                        ifNode.FalseStatements = HandleElseBlocks(elseStatements, instructionToNodeMapping);
+                    }
+                }
+                else if (statements[i] is LoopNode loop)
+                {
+                    loop.Statements = HandleElseBlocks(loop.Statements, instructionToNodeMapping);
+                }
+            }
+
+            return ImmutableArray.CreateRange(result);
         }
     }
 }

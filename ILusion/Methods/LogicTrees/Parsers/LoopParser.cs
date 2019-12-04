@@ -28,11 +28,13 @@ namespace ILusion.Methods.LogicTrees.Parsers
             }
 
             var condition = ParsingHelper.ParseConditionalNodeCondition(parsingContext.NodeStack, out var conditionResultVariable, out var children);
+            var firstConditionNode = NodeHelper.GetFirstRecursively(condition);
+            var firstConditionInstruction = parsingContext.InstructionToNodeMapping.First(x => x.Value == firstConditionNode).Key;
             var statements = new List<LogicNode>();
             var isWhile = false;
 
             if ((targetInstruction.Previous?.OpCode == OpCodes.Br || targetInstruction.Previous?.OpCode == OpCodes.Br_S)
-                && parsingContext.InstructionToNodeMapping[(Instruction)targetInstruction.Previous.Operand] == NodeHelper.GetFirstRecursively(condition))
+                && parsingContext.InstructionToNodeMapping[(Instruction)targetInstruction.Previous.Operand] == firstConditionNode)
             {
                 isWhile = true;
             }
@@ -65,7 +67,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
             statements.Reverse();
 
-            HandleBreak(parsingContext, statements, parsingContext.Instruction.Next);
+            HandleBreakAndContinue(parsingContext, statements, parsingContext.Instruction.Next, firstConditionInstruction);
 
             if (isWhile)
             {
@@ -77,7 +79,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
             }
         }
 
-        private static void HandleBreak(ParsingContext parsingContext, List<LogicNode> statements, Instruction breakInstruction)
+        private static void HandleBreakAndContinue(ParsingContext parsingContext, List<LogicNode> statements, Instruction breakInstruction, Instruction continueInstruction)
         {
             for (var i = 0; i < statements.Count; i++)
             {
@@ -85,12 +87,12 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
                 if (statement is IfNode ifNode)
                 {
-                    ifNode.TrueStatements = HandleBreakInIf(parsingContext, ifNode, ifNode.TrueStatements, breakInstruction);
-                    ifNode.FalseStatements = HandleBreakInIf(parsingContext, ifNode, ifNode.FalseStatements, breakInstruction);
+                    ifNode.TrueStatements = HandleBreakAndContinueInIf(parsingContext, ifNode.TrueStatements, breakInstruction, continueInstruction);
+                    ifNode.FalseStatements = HandleBreakAndContinueInIf(parsingContext, ifNode.FalseStatements, breakInstruction, continueInstruction);
                 }
                 else
                 {
-                    var newStatement = HandleBreak(parsingContext, statement, breakInstruction);
+                    var newStatement = HandleBreakAndContinue(parsingContext, statement, breakInstruction, continueInstruction);
 
                     if (newStatement != statement)
                     {
@@ -100,7 +102,11 @@ namespace ILusion.Methods.LogicTrees.Parsers
             }
         }
 
-        private static IReadOnlyList<LogicNode> HandleBreakInIf(ParsingContext parsingContext, IfNode ifNode, IReadOnlyList<LogicNode> statements, Instruction breakInstruction)
+        private static IReadOnlyList<LogicNode> HandleBreakAndContinueInIf(
+            ParsingContext parsingContext,
+            IReadOnlyList<LogicNode> statements,
+            Instruction breakInstruction,
+            Instruction continueInstruction)
         {
             if (statements == null)
             {
@@ -115,12 +121,12 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
                 if (statement is IfNode subIfNode)
                 {
-                    subIfNode.TrueStatements = HandleBreakInIf(parsingContext, subIfNode, subIfNode.TrueStatements, breakInstruction);
-                    subIfNode.FalseStatements = HandleBreakInIf(parsingContext, subIfNode, subIfNode.FalseStatements, breakInstruction);
+                    subIfNode.TrueStatements = HandleBreakAndContinueInIf(parsingContext, subIfNode.TrueStatements, breakInstruction, continueInstruction);
+                    subIfNode.FalseStatements = HandleBreakAndContinueInIf(parsingContext, subIfNode.FalseStatements, breakInstruction, continueInstruction);
                 }
                 else
                 {
-                    var newStatement = HandleBreak(parsingContext, statement, breakInstruction);
+                    var newStatement = HandleBreakAndContinue(parsingContext, statement, breakInstruction, continueInstruction);
 
                     if (newStatement != statement)
                     {
@@ -132,13 +138,20 @@ namespace ILusion.Methods.LogicTrees.Parsers
             return ImmutableArray.CreateRange(editableStatements);
         }
 
-        private static LogicNode HandleBreak(ParsingContext parsingContext, LogicNode node, Instruction breakInstruction)
+        private static LogicNode HandleBreakAndContinue(ParsingContext parsingContext, LogicNode node, Instruction breakInstruction, Instruction continueInstruction)
         {
             var result = node;
 
-            if (node is GoToNode goTo && goTo.OriginalTarget == breakInstruction)
+            if (node is GoToNode goTo)
             {
-                result = new BreakNode(breakInstruction);
+                if (goTo.OriginalTarget == breakInstruction)
+                {
+                    result = new BreakNode(breakInstruction);
+                }
+                else if (goTo.OriginalTarget == continueInstruction)
+                {
+                    result = new ContinueNode(continueInstruction);
+                }
             }
             else if (node is ReturnNode && breakInstruction.OpCode == OpCodes.Ret)
             {

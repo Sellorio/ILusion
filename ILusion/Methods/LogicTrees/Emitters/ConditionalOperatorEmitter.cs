@@ -27,7 +27,6 @@ namespace ILusion.Methods.LogicTrees.Emitters
 
             // update the brtrue to the instruction right after the false block branch (i.e. the first true-block instruction)
             brTrueInstruction.Operand = brInstruction.Next;
-            BranchHelper.UpdateBranchOpCode(brTrueInstruction);
         }
 
         protected override void UpdateBranches(EmitterContext<ConditionalOperatorNode> emitterContext)
@@ -36,7 +35,6 @@ namespace ILusion.Methods.LogicTrees.Emitters
 
             // update the false block branch to the instruction after the last true block instruction
             branchOutOfFalseBlock.Key.Operand = emitterContext.InstructionToNodeMapping.Last(x => x.Value == emitterContext.Node.TrueExpression.Last()).Key.Next;
-            BranchHelper.UpdateBranchOpCode(branchOutOfFalseBlock.Key);
         }
     }
 }

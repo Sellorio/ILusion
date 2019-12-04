@@ -27,6 +27,15 @@
             }
         }
 
+        public static void AlwaysContinueAtEnd(bool condition)
+        {
+            while (condition)
+            {
+                Do();
+                continue;
+            }
+        }
+
         public static void AlwaysReturnAtEnd(bool condition)
         {
             while (condition)
@@ -66,6 +75,36 @@
             }
         }
 
+        public static void ContinueFromIf(bool c1, bool c2)
+        {
+            while (c1)
+            {
+                Do();
+
+                if (c2)
+                {
+                    continue;
+                }
+            }
+        }
+
+        public static void ContinueFromIfWithElse(bool c1, bool c2)
+        {
+            while (c1)
+            {
+                Do();
+
+                if (c2)
+                {
+                    continue;
+                }
+                else
+                {
+                    Do();
+                }
+            }
+        }
+
         public static void WithIfElse(bool c1, bool c2)
         {
             while (c1)
@@ -96,6 +135,24 @@
                     if (c3)
                     {
                         break;
+                    }
+                }
+            }
+        }
+
+        public static void ContinueFromIfInIf(bool c1, bool c2, bool c3)
+        {
+            while (c1)
+            {
+                Do();
+
+                if (c2)
+                {
+                    Do();
+
+                    if (c3)
+                    {
+                        continue;
                     }
                 }
             }

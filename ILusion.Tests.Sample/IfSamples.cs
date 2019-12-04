@@ -20,6 +20,8 @@
             {
                 Method("false");
             }
+
+            Method("always");
         }
 
         public static void InvertedCondition(bool condition)
@@ -32,6 +34,8 @@
             {
                 Method("false");
             }
+
+            Method("always");
         }
 
         private static void Method(string value)

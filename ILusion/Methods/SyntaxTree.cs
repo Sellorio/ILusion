@@ -103,7 +103,9 @@ namespace ILusion.Methods
                 branch.Target = target;
             }
 
-            return new SyntaxTree(nodeStack.Reverse());
+            var statements = ParsingHelper.HandleElseBlocks(nodeStack.Reverse().ToList(), instructionToNodeMapping);
+
+            return new SyntaxTree(statements);
         }
     }
 }

@@ -36,7 +36,6 @@ namespace ILusion.Methods.LogicTrees.Emitters
                 }
 
                 toFalseOrEnd.Operand = toEnd.Next;
-                BranchHelper.UpdateBranchOpCode(toFalseOrEnd);
             }
         }
 
@@ -47,12 +46,10 @@ namespace ILusion.Methods.LogicTrees.Emitters
             if (emitterContext.Node.FalseStatements == null)
             {
                 incompleteBranch.Key.Operand = emitterContext.InstructionToNodeMapping.Last(x => x.Value == emitterContext.Node.TrueStatements.Last()).Key.Next;
-                BranchHelper.UpdateBranchOpCode(incompleteBranch.Key);
             }
             else
             {
                 incompleteBranch.Key.Operand = emitterContext.InstructionToNodeMapping.Last(x => x.Value == emitterContext.Node.FalseStatements.Last()).Key.Next;
-                BranchHelper.UpdateBranchOpCode(incompleteBranch.Key);
             }
         }
     }

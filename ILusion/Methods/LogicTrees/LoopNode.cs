@@ -6,7 +6,7 @@ namespace ILusion.Methods.LogicTrees
 {
     public abstract class LoopNode : ConditionalNode
     {
-        public IReadOnlyList<LogicNode> Statements { get; }
+        public IReadOnlyList<LogicNode> Statements { get; internal set; }
 
         internal LoopNode(
             ValueNode condition,

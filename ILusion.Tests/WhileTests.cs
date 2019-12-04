@@ -78,6 +78,30 @@ namespace ILusion.Tests
         }
 
         [Fact]
+        public void AlwaysContinueAtEnd()
+        {
+            var sampleMethod = GetSampleMethod(nameof(WhileSamples), nameof(WhileSamples.AlwaysContinueAtEnd));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x =>
+                {
+                    var whileNode =
+                        CheckNode<WhileNode>(x,
+                            y => CheckNode<ParameterNode>(y));
+
+                    Assert.Same(NthValueChild(x, 0), whileNode.Condition);
+                    CheckStatements(
+                        whileNode.Statements,
+                        y => CheckNode<ActionCallNode>(y),
+                        y => CheckNode<ContinueNode>(y));
+                });
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+
+        [Fact]
         public void AlwaysReturnAtEnd()
         {
             var sampleMethod = GetSampleMethod(nameof(WhileSamples), nameof(WhileSamples.AlwaysReturnAtEnd));
@@ -164,6 +188,69 @@ namespace ILusion.Tests
         }
 
         [Fact]
+        public void ContinueFromIf()
+        {
+            var sampleMethod = GetSampleMethod(nameof(WhileSamples), nameof(WhileSamples.ContinueFromIf));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x =>
+                {
+                    var whileNode =
+                        CheckNode<WhileNode>(x,
+                            y => CheckNode<ParameterNode>(y));
+
+                    Assert.Same(NthValueChild(x, 0), whileNode.Condition);
+                    CheckStatements(
+                        whileNode.Statements,
+                        y => CheckNode<ActionCallNode>(y),
+                        y =>
+                        {
+                            var ifNode = CheckNode<IfNode>(y, z => CheckNode<ParameterNode>(z));
+                            CheckStatements(
+                                ifNode.TrueStatements,
+                                z => CheckNode<ContinueNode>(z));
+                            Assert.Null(ifNode.FalseStatements);
+                        });
+                });
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+
+        [Fact]
+        public void ContinueFromIfWithElse()
+        {
+            var sampleMethod = GetSampleMethod(nameof(WhileSamples), nameof(WhileSamples.ContinueFromIfWithElse));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x =>
+                {
+                    var whileNode =
+                        CheckNode<WhileNode>(x,
+                            y => CheckNode<ParameterNode>(y));
+
+                    Assert.Same(NthValueChild(x, 0), whileNode.Condition);
+                    CheckStatements(
+                        whileNode.Statements,
+                        y => CheckNode<ActionCallNode>(y),
+                        y =>
+                        {
+                            var ifNode = CheckNode<IfNode>(y, z => CheckNode<ParameterNode>(z));
+                            CheckStatements(
+                                ifNode.TrueStatements,
+                                z => CheckNode<ContinueNode>(z));
+                            Assert.Null(ifNode.FalseStatements);
+                        },
+                        y => CheckNode<ActionCallNode>(y));
+                });
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+
+        [Fact]
         public void WithIfElse()
         {
             var sampleMethod = GetSampleMethod(nameof(WhileSamples), nameof(WhileSamples.WithIfElse));
@@ -226,6 +313,44 @@ namespace ILusion.Tests
                                     CheckStatements(
                                         childIfNode.TrueStatements,
                                         a => CheckNode<BreakNode>(a));
+                                    Assert.Null(childIfNode.FalseStatements);
+                                });
+                        });
+                });
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+
+        [Fact]
+        public void ContinueFromIfInIf()
+        {
+            var sampleMethod = GetSampleMethod(nameof(WhileSamples), nameof(WhileSamples.ContinueFromIfInIf));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x =>
+                {
+                    var whileNode =
+                        CheckNode<WhileNode>(x,
+                            y => CheckNode<ParameterNode>(y));
+
+                    Assert.Same(NthValueChild(x, 0), whileNode.Condition);
+                    CheckStatements(
+                        whileNode.Statements,
+                        y => CheckNode<ActionCallNode>(y),
+                        y =>
+                        {
+                            var ifNode = CheckNode<IfNode>(y, z => CheckNode<ParameterNode>(z));
+                            CheckStatements(
+                                ifNode.TrueStatements,
+                                z => CheckNode<ActionCallNode>(z),
+                                z =>
+                                {
+                                    var childIfNode = CheckNode<IfNode>(z, a => CheckNode<ParameterNode>(a));
+                                    CheckStatements(
+                                        childIfNode.TrueStatements,
+                                        a => CheckNode<ContinueNode>(a));
                                     Assert.Null(childIfNode.FalseStatements);
                                 });
                         });
