@@ -1,11 +1,11 @@
-﻿using Mono.Cecil.Cil;
+﻿using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
-    public sealed class BreakNode : BranchNode
+    public sealed class BreakNode : LogicNode
     {
-        internal BreakNode(Instruction originalTarget)
-            : base(originalTarget)
+        internal BreakNode()
+            : base(Enumerable.Empty<LogicNode>())
         {
         }
     }

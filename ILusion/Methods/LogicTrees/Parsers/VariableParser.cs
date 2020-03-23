@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ILusion.Methods.LogicTrees.Nodes;
-using Mono.Cecil;
+﻿using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil.Cil;
 
 namespace ILusion.Methods.LogicTrees.Parsers

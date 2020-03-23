@@ -1,7 +1,6 @@
 ﻿using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using System;
 
 namespace ILusion.Methods.LogicTrees.Emitters
 {

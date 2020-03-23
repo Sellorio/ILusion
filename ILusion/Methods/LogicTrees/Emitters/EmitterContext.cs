@@ -1,26 +1,35 @@
 ﻿using ILusion.Exceptions;
-using ILusion.Methods.LogicTrees.Nodes;
+using ILusion.Methods.LogicTrees.Helpers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Emitters
 {
     internal class EmitterContext<TNode>
         where TNode : LogicNode
     {
+        internal LogicNode BreakContext { get; }
+        internal LogicNode ContinueContext { get; }
         internal Dictionary<Instruction, LogicNode> InstructionToNodeMapping { get; }
         internal MethodDefinition Target { get; }
         internal TNode Node { get; }
         internal VariableDefinition ReturnVariable { get; }
 
-        internal EmitterContext(Dictionary<Instruction, LogicNode> instructionToNodeMapping, MethodDefinition target, TNode node, VariableDefinition returnVariable)
+        internal EmitterContext(
+            Dictionary<Instruction, LogicNode> instructionToNodeMapping,
+            MethodDefinition target,
+            TNode node,
+            VariableDefinition returnVariable,
+            LogicNode breakContext,
+            LogicNode continueContext)
         {
             InstructionToNodeMapping = instructionToNodeMapping;
             Target = target;
             Node = node;
             ReturnVariable = returnVariable;
+            BreakContext = breakContext;
+            ContinueContext = continueContext;
         }
 
         public EmitterContext<TNode> Emit(OpCode opCode)
@@ -121,6 +130,34 @@ namespace ILusion.Methods.LogicTrees.Emitters
             }
 
             return Add(Instruction.Create(opCode, Target.Body.Instructions[0]));
+        }
+
+        public void EmitChildInstructions(
+            LogicNode child,
+            LogicNode newBreakContext = null,
+            LogicNode newContinueContext = null)
+        {
+            EmissionHelper.EmitInstructions(
+                InstructionToNodeMapping,
+                Target,
+                child,
+                ReturnVariable,
+                newBreakContext ?? BreakContext,
+                newContinueContext ?? ContinueContext);
+        }
+
+        public void UpdateChildBranches(
+            LogicNode child,
+            LogicNode newBreakContext = null,
+            LogicNode newContinueContext = null)
+        {
+            EmissionHelper.UpdateBranches(
+                InstructionToNodeMapping,
+                Target,
+                child,
+                ReturnVariable,
+                newBreakContext ?? BreakContext,
+                newContinueContext ?? ContinueContext);
         }
 
         private EmitterContext<TNode> Add(Instruction instruction)

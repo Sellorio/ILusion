@@ -1,11 +1,11 @@
-﻿using Mono.Cecil.Cil;
+﻿using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Nodes
 {
-    public sealed class ContinueNode : BranchNode
+    public sealed class ContinueNode : LogicNode
     {
-        internal ContinueNode(Instruction originalTarget)
-            : base(originalTarget)
+        internal ContinueNode()
+            : base(Enumerable.Empty<LogicNode>())
         {
         }
     }

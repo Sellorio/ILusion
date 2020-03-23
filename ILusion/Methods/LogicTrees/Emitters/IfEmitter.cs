@@ -22,7 +22,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
 
             foreach (var node in emitterContext.Node.TrueStatements)
             {
-                EmissionHelper.EmitInstructions(emitterContext.InstructionToNodeMapping, emitterContext.Target, node, emitterContext.ReturnVariable);
+                emitterContext.EmitChildInstructions(node);
             }
 
             if (emitterContext.Node.FalseStatements != null)
@@ -32,7 +32,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
 
                 foreach (var node in emitterContext.Node.FalseStatements)
                 {
-                    EmissionHelper.EmitInstructions(emitterContext.InstructionToNodeMapping, emitterContext.Target, node, emitterContext.ReturnVariable);
+                    emitterContext.EmitChildInstructions(node);
                 }
 
                 toFalseOrEnd.Operand = toEnd.Next;
@@ -50,6 +50,19 @@ namespace ILusion.Methods.LogicTrees.Emitters
             else
             {
                 incompleteBranch.Key.Operand = emitterContext.InstructionToNodeMapping.Last(x => x.Value == emitterContext.Node.FalseStatements.Last()).Key.Next;
+            }
+
+            foreach (var statement in emitterContext.Node.TrueStatements)
+            {
+                emitterContext.UpdateChildBranches(statement);
+            }
+
+            if (emitterContext.Node.FalseStatements != null)
+            {
+                foreach (var statement in emitterContext.Node.FalseStatements)
+                {
+                    emitterContext.UpdateChildBranches(statement);
+                }
             }
         }
     }

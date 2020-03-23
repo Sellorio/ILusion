@@ -1,5 +1,4 @@
 ﻿using Mono.Cecil;
-using Mono.Cecil.Cil;
 using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Nodes

@@ -1,7 +1,6 @@
 ﻿using ILusion.Methods;
 using ILusion.Methods.LogicTrees.Nodes;
 using ILusion.Tests.Sample;
-using System.Linq;
 using Xunit;
 
 namespace ILusion.Tests

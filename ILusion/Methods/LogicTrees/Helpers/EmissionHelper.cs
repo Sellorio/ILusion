@@ -25,13 +25,15 @@ namespace ILusion.Methods.LogicTrees.Helpers
 
         internal static void EmitInstructions(
             Dictionary<Instruction, LogicNode> instructionToNodeMapping,
-            MethodDefinition methodDefinition,
+            MethodDefinition target,
             LogicNode node,
-            VariableDefinition returnVariable)
+            VariableDefinition returnVariable,
+            LogicNode breakContext,
+            LogicNode continueContext)
         {
             foreach (var child in node.Children)
             {
-                EmitInstructions(instructionToNodeMapping, methodDefinition, child, returnVariable);
+                EmitInstructions(instructionToNodeMapping, target, child, returnVariable, breakContext, continueContext);
             }
 
             if (!_mappedEmitters.TryGetValue(node.GetType(), out var emitter))
@@ -39,21 +41,28 @@ namespace ILusion.Methods.LogicTrees.Helpers
                 throw new EmissionException($"No emitter found that supports {node.GetType().Name}.");
             }
 
-            emitter.Emit(instructionToNodeMapping, methodDefinition, node, returnVariable);
+            emitter.Emit(instructionToNodeMapping, target, node, returnVariable, breakContext, continueContext);
         }
 
         internal static void UpdateBranches(
             Dictionary<Instruction, LogicNode> instructionToNodeMapping,
-            MethodDefinition methodDefinition,
+            MethodDefinition target,
             LogicNode node,
-            VariableDefinition returnVariable)
+            VariableDefinition returnVariable,
+            LogicNode breakContext,
+            LogicNode continueContext)
         {
+            foreach (var child in node.Children)
+            {
+                UpdateBranches(instructionToNodeMapping, target, child, returnVariable, breakContext, continueContext);
+            }
+
             if (!_mappedEmitters.TryGetValue(node.GetType(), out var emitter))
             {
                 throw new EmissionException($"No emitter found that supports {node.GetType().Name}.");
             }
 
-            emitter.UpdateBranches(instructionToNodeMapping, methodDefinition, node, returnVariable);
+            emitter.UpdateBranches(instructionToNodeMapping, target, node, returnVariable, breakContext, continueContext);
         }
 
         internal static void ComputeOffsets(MethodDefinition method)

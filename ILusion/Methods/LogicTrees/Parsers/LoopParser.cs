@@ -146,16 +146,16 @@ namespace ILusion.Methods.LogicTrees.Parsers
             {
                 if (goTo.OriginalTarget == breakInstruction)
                 {
-                    result = new BreakNode(breakInstruction);
+                    result = new BreakNode();
                 }
                 else if (goTo.OriginalTarget == continueInstruction)
                 {
-                    result = new ContinueNode(continueInstruction);
+                    result = new ContinueNode();
                 }
             }
             else if (node is ReturnNode && breakInstruction.OpCode == OpCodes.Ret)
             {
-                result = new BreakNode(null);
+                result = new BreakNode();
             }
 
             if (result != node)

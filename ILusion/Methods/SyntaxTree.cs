@@ -1,8 +1,6 @@
 ﻿using ILusion.Exceptions;
 using ILusion.Methods.LogicTrees;
-using ILusion.Methods.LogicTrees.Emitters;
 using ILusion.Methods.LogicTrees.Helpers;
-using ILusion.Methods.LogicTrees.Parsers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
@@ -39,7 +37,7 @@ namespace ILusion.Methods
 
             foreach (var statement in Statements)
             {
-                EmissionHelper.EmitInstructions(instructionToNodeMapping, methodDefinition, statement, returnVariable);
+                EmissionHelper.EmitInstructions(instructionToNodeMapping, methodDefinition, statement, returnVariable, null, null);
             }
 
             if (returnVariable != null)
@@ -52,9 +50,9 @@ namespace ILusion.Methods
                 methodDefinition.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
             }
 
-            foreach (var node in instructionToNodeMapping.Values.Distinct())
+            foreach (var statement in Statements)
             {
-                EmissionHelper.UpdateBranches(instructionToNodeMapping, methodDefinition, node, returnVariable);
+                EmissionHelper.UpdateBranches(instructionToNodeMapping, methodDefinition, statement, returnVariable, null, null);
             }
 
             EmissionHelper.ComputeOffsets(methodDefinition);

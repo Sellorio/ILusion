@@ -1,7 +1,6 @@
 ﻿using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil.Cil;
-using System;
 using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Emitters
@@ -22,17 +21,14 @@ namespace ILusion.Methods.LogicTrees.Emitters
                 emitterContext.Target.Body.Instructions.RemoveAt(i);
             }
 
-            Instruction whileBranch = null;
-
             if (emitterContext.Node is WhileNode)
             {
                 emitterContext.Emit(OpCodes.Br, firstConditionInstruction);
-                whileBranch = emitterContext.Target.Body.Instructions.Last();
             }
 
             foreach (var node in emitterContext.Node.Statements)
             {
-                EmissionHelper.EmitInstructions(emitterContext.InstructionToNodeMapping, emitterContext.Target, node, emitterContext.ReturnVariable);
+                emitterContext.EmitChildInstructions(node, emitterContext.Node, emitterContext.Node);
             }
 
             var firstStatementNode = NodeHelper.GetFirstRecursively(emitterContext.Node.Statements.First());
@@ -78,7 +74,10 @@ namespace ILusion.Methods.LogicTrees.Emitters
 
         protected override void UpdateBranches(EmitterContext<LoopNode> emitterContext)
         {
-            base.UpdateBranches(emitterContext);
+            foreach (var node in emitterContext.Node.Statements)
+            {
+                emitterContext.UpdateChildBranches(node, emitterContext.Node, emitterContext.Node);
+            }
         }
     }
 }

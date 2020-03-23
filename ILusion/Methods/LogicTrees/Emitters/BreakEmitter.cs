@@ -1,5 +1,6 @@
 ﻿using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil.Cil;
+using System;
 using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Emitters
@@ -14,11 +15,13 @@ namespace ILusion.Methods.LogicTrees.Emitters
         protected override void UpdateBranches(EmitterContext<BreakNode> emitterContext)
         {
             var branch = emitterContext.InstructionToNodeMapping.Single(x => x.Value == emitterContext.Node);
-            var target =
-                emitterContext.Node.OriginalTarget == null
-                    ? emitterContext.Target.Body.Instructions.Last()
-                    : emitterContext.InstructionToNodeMapping.First(x => x.Value == emitterContext.Node.Target).Key;
 
+            if (emitterContext.ContinueContext == null)
+            {
+                throw new InvalidOperationException("Break is only valid inside a loop or switch statement.");
+            }
+
+            var target = emitterContext.InstructionToNodeMapping.Last(x => x.Value == emitterContext.ContinueContext).Key.Next;
             branch.Key.Operand = target;
         }
     }
