@@ -35,6 +35,14 @@ namespace ILusion.Methods.LogicTrees.Parsers
             var valueNodes = ParsingHelper.GetValueNodes(parsingContext.NodeStack, parameterCount + 1, out var children);
             var target = valueNodes[0];
 
+            for (var i = 1; i < parameterCount + 1; i++)
+            {
+                if (constructor.Parameters[i - 1].ParameterType.FullName == "System.Boolean")
+                {
+                    ParsingHelper.HandleBooleanLiteral(parsingContext.Method, valueNodes[i]);
+                }
+            }
+
             if (!(target is ReferenceValueNode))
             {
                 throw new ParsingException("Initialize target was expected to be an address/reference.");

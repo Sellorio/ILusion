@@ -10,7 +10,6 @@ namespace ILusion.Tests
         [Fact]
         public void WithoutVariable()
         {
-
             var sampleMethod = GetSampleMethod(nameof(IsSamples), nameof(IsSamples.WithoutVariable));
             var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
 
@@ -35,7 +34,6 @@ namespace ILusion.Tests
         [Fact]
         public void WithVariable()
         {
-
             var sampleMethod = GetSampleMethod(nameof(IsSamples), nameof(IsSamples.WithVariable));
             var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
 

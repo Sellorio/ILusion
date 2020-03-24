@@ -21,7 +21,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
                 emitterContext.Target.Body.Instructions.RemoveAt(i);
             }
 
-            if (emitterContext.Node is WhileNode)
+            if (emitterContext.Node is WhileNode || emitterContext.Node is ForLoopNode)
             {
                 emitterContext.Emit(OpCodes.Br, firstConditionInstruction);
             }
@@ -29,6 +29,11 @@ namespace ILusion.Methods.LogicTrees.Emitters
             foreach (var node in emitterContext.Node.Statements)
             {
                 emitterContext.EmitChildInstructions(node, emitterContext.Node, emitterContext.Node);
+            }
+
+            if (emitterContext.Node is ForLoopNode forLoop)
+            {
+                emitterContext.EmitChildInstructions(forLoop.IteratorAssignment);
             }
 
             var firstStatementNode = NodeHelper.GetFirstRecursively(emitterContext.Node.Statements.First());

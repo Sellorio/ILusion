@@ -67,14 +67,42 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
             statements.Reverse();
 
-            HandleBreakAndContinue(parsingContext, statements, parsingContext.Instruction.Next, firstConditionInstruction);
-
             if (isWhile)
             {
-                return parsingContext.Success(new WhileNode(condition, conditionResultVariable, statements, children));
+                var lastStatement = statements.LastOrDefault();
+
+                if (lastStatement is VariableAssignmentNode || lastStatement is ParameterAssignmentNode)
+                {
+                    var firstNodeOfAssignment = NodeHelper.GetFirstRecursively(lastStatement);
+                    var firstInstructionOfAssignment = parsingContext.InstructionToNodeMapping.First(x => x.Value == firstNodeOfAssignment).Key;
+
+                    HandleBreakAndContinue(parsingContext, statements, parsingContext.Instruction.Next, firstInstructionOfAssignment);
+
+                    var initialAssignments = new List<LogicNode>();
+
+                    while (parsingContext.NodeStack.Peek() is VariableAssignmentNode || parsingContext.NodeStack.Peek() is ParameterAssignmentNode)
+                    {
+                        initialAssignments.Add(parsingContext.NodeStack.Pop());
+                    }
+
+                    return parsingContext.Success(
+                        new ForNode(
+                            Enumerable.Reverse(initialAssignments),
+                            condition,
+                            conditionResultVariable,
+                            lastStatement,
+                            statements.Take(statements.Count - 1),
+                            children));
+                }
+                else
+                {
+                    HandleBreakAndContinue(parsingContext, statements, parsingContext.Instruction.Next, firstConditionInstruction);
+                    return parsingContext.Success(new WhileNode(condition, conditionResultVariable, statements, children));
+                }
             }
             else
             {
+                HandleBreakAndContinue(parsingContext, statements, parsingContext.Instruction.Next, firstConditionInstruction);
                 return parsingContext.Success(new DoWhileNode(condition, conditionResultVariable, statements, children));
             }
         }
@@ -100,6 +128,37 @@ namespace ILusion.Methods.LogicTrees.Parsers
                     }
                 }
             }
+        }
+
+        private static LogicNode HandleBreakAndContinue(ParsingContext parsingContext, LogicNode node, Instruction breakInstruction, Instruction continueInstruction)
+        {
+            var result = node;
+
+            if (node is GoToNode goTo)
+            {
+                if (goTo.OriginalTarget == breakInstruction)
+                {
+                    result = new BreakNode();
+                }
+                else if (goTo.OriginalTarget == continueInstruction)
+                {
+                    result = new ContinueNode();
+                }
+            }
+            else if (node is ReturnNode && breakInstruction.OpCode == OpCodes.Ret)
+            {
+                result = new BreakNode();
+            }
+
+            if (result != node)
+            {
+                foreach (var key in parsingContext.InstructionToNodeMapping.Where(x => x.Value == node).Select(x => x.Key).ToList())
+                {
+                    parsingContext.InstructionToNodeMapping[key] = result;
+                }
+            }
+
+            return result;
         }
 
         private static IReadOnlyList<LogicNode> HandleBreakAndContinueInIf(
@@ -136,37 +195,6 @@ namespace ILusion.Methods.LogicTrees.Parsers
             }
 
             return ImmutableArray.CreateRange(editableStatements);
-        }
-
-        private static LogicNode HandleBreakAndContinue(ParsingContext parsingContext, LogicNode node, Instruction breakInstruction, Instruction continueInstruction)
-        {
-            var result = node;
-
-            if (node is GoToNode goTo)
-            {
-                if (goTo.OriginalTarget == breakInstruction)
-                {
-                    result = new BreakNode();
-                }
-                else if (goTo.OriginalTarget == continueInstruction)
-                {
-                    result = new ContinueNode();
-                }
-            }
-            else if (node is ReturnNode && breakInstruction.OpCode == OpCodes.Ret)
-            {
-                result = new BreakNode();
-            }
-
-            if (result != node)
-            {
-                foreach (var key in parsingContext.InstructionToNodeMapping.Where(x => x.Value == node).Select(x => x.Key).ToList())
-                {
-                    parsingContext.InstructionToNodeMapping[key] = result;
-                }
-            }
-
-            return result;
         }
     }
 }
