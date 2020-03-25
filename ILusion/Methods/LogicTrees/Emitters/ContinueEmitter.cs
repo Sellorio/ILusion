@@ -1,4 +1,5 @@
-﻿using ILusion.Methods.LogicTrees.Nodes;
+﻿using ILusion.Methods.LogicTrees.Helpers;
+using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil.Cil;
 using System;
 using System.Linq;
@@ -21,7 +22,13 @@ namespace ILusion.Methods.LogicTrees.Emitters
                 throw new InvalidOperationException("Continue is only valid inside a loop statement.");
             }
 
-            var target = emitterContext.InstructionToNodeMapping.Last(x => x.Value == emitterContext.ContinueContext.Children.First()).Key;
+            var targetNode =
+                NodeHelper.GetFirstRecursively(
+                    emitterContext.ContinueContext is ForLoopNode forLoop
+                        ? forLoop.IteratorAssignment
+                        : emitterContext.ContinueContext);
+
+            var target = emitterContext.InstructionToNodeMapping.Last(x => x.Value == targetNode).Key;
             branch.Key.Operand = target;
         }
     }

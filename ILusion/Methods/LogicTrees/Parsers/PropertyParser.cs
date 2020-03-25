@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using ILusion.Methods.LogicTrees.Helpers;
+﻿using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Parsers
 {
@@ -38,7 +38,11 @@ namespace ILusion.Methods.LogicTrees.Parsers
             var valueNodes = ParsingHelper.GetValueNodes(parsingContext.NodeStack, expectedStackValues, out var nodes);
 
             var property = calledMethod.DeclaringType.Properties.First(x => x.GetMethod == calledMethod);
-            var isBaseCall = instruction.OpCode == OpCodes.Call && !calledMethod.IsStatic && !calledMethod.DeclaringType.IsValueType && calledMethod.IsVirtual;
+            var isBaseCall =
+                instruction.OpCode == OpCodes.Call
+                && !calledMethod.IsStatic
+                && !calledMethod.DeclaringType.IsValueType
+                && calledMethod.IsVirtual;
 
             return
                 parsingContext.Success(
