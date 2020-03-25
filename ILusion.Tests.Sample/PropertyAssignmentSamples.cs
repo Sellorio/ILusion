@@ -55,6 +55,26 @@
         string Prop { set; }
     }
 
+    public struct PropertyAssignmentSamplesStruct
+    {
+        public string InstanceAutoProperty { get; set; }
+
+        public void SetInstanceAutoPropertyStruct()
+        {
+            InstanceAutoProperty = "";
+        }
+
+        public void SetInstanceAutoPropertyOnObject(PropertyAssignmentSamples target)
+        {
+            target.InstanceAutoProperty = "";
+        }
+
+        public void SetInstanceVirtualAutoPropertyOnObject(PropertyAssignmentSamples target)
+        {
+            target.InstanceVirtualAutoProperty = "";
+        }
+    }
+
     public static class GenericPropertyAssignmentSamples<T>
         where T : IPropertyAssignmentHasProp
     {

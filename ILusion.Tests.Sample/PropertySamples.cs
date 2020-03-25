@@ -50,6 +50,26 @@
         }
     }
 
+    public struct PropertySamplesStruct
+    {
+        public string InstanceAutoProperty { get; set; }
+
+        public void GetInstanceAutoPropertyStruct()
+        {
+            var x = InstanceAutoProperty;
+        }
+
+        public void GetInstanceAutoPropertyOnObject(PropertySamples target)
+        {
+            var x = target.InstanceAutoProperty;
+        }
+
+        public void GetInstanceVirtualAutoPropertyOnObject(PropertySamples target)
+        {
+            var x = target.InstanceVirtualAutoProperty;
+        }
+    }
+
     public interface IHasProp
     {
         string Prop { get; }

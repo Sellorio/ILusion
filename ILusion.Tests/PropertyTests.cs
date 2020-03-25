@@ -235,5 +235,83 @@ namespace ILusion.Tests
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
+
+        [Fact]
+        public void GetInstanceAutoPropertyStruct()
+        {
+            var sampleMethod = GetSampleMethod(nameof(PropertySamplesStruct), nameof(PropertySamplesStruct.GetInstanceAutoPropertyStruct));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x,
+                    y =>
+                    {
+                        var property =
+                            CheckNode<PropertyNode>(y,
+                                z => CheckNode<ThisReferenceNode>(z));
+
+                        Assert.Same(NthValueChild(y, 0), property.Instance);
+                        Assert.False(property.IsBaseCall);
+                        Assert.NotNull(property.Property);
+                        Assert.Null(property.ConstrainedModifier);
+                        Assert.Equal("InstanceAutoProperty", property.Property.Name);
+                        Assert.Equal("System.String", property.GetValueType()?.FullName);
+                    }));
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+
+        [Fact]
+        public void GetInstanceAutoPropertyOnObject()
+        {
+            var sampleMethod = GetSampleMethod(nameof(PropertySamplesStruct), nameof(PropertySamplesStruct.GetInstanceAutoPropertyOnObject));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x,
+                    y =>
+                    {
+                        var property =
+                            CheckNode<PropertyNode>(y,
+                                z => CheckNode<ParameterNode>(z));
+
+                        Assert.Same(NthValueChild(y, 0), property.Instance);
+                        Assert.False(property.IsBaseCall);
+                        Assert.NotNull(property.Property);
+                        Assert.Null(property.ConstrainedModifier);
+                        Assert.Equal("InstanceAutoProperty", property.Property.Name);
+                        Assert.Equal("System.String", property.GetValueType()?.FullName);
+                    }));
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+
+        [Fact]
+        public void GetInstanceVirtualAutoPropertyOnObject()
+        {
+            var sampleMethod = GetSampleMethod(nameof(PropertySamplesStruct), nameof(PropertySamplesStruct.GetInstanceVirtualAutoPropertyOnObject));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x,
+                    y =>
+                    {
+                        var property =
+                            CheckNode<PropertyNode>(y,
+                                z => CheckNode<ParameterNode>(z));
+
+                        Assert.Same(NthValueChild(y, 0), property.Instance);
+                        Assert.False(property.IsBaseCall);
+                        Assert.NotNull(property.Property);
+                        Assert.Null(property.ConstrainedModifier);
+                        Assert.Equal("InstanceVirtualAutoProperty", property.Property.Name);
+                        Assert.Equal("System.String", property.GetValueType()?.FullName);
+                    }));
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
     }
 }

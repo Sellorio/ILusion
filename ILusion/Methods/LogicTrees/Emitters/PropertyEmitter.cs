@@ -17,7 +17,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
                     || emitterContext.Node.IsBaseCall
                     || emitterContext.Node.Property.DeclaringType.IsValueType
                     || (!emitterContext.Node.Property.GetMethod.IsVirtual
-                        && emitterContext.Node.Property.DeclaringType == emitterContext.Target.DeclaringType)
+                        && emitterContext.Node.Instance is ThisNode)
                     ? OpCodes.Call
                     : OpCodes.Callvirt,
                 emitterContext.Node.GetMethod);

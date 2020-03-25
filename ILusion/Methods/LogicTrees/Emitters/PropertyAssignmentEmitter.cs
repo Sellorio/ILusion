@@ -16,7 +16,10 @@ namespace ILusion.Methods.LogicTrees.Emitters
                 emitterContext.Node.Instance == null
                     || emitterContext.Node.IsBaseCall
                     || emitterContext.Node.Property.DeclaringType.IsValueType
-                    || !emitterContext.Node.Property.SetMethod.IsVirtual ? OpCodes.Call : OpCodes.Callvirt,
+                    || (!emitterContext.Node.Property.SetMethod.IsVirtual
+                        && emitterContext.Node.Instance is ThisNode)
+                    ? OpCodes.Call
+                    : OpCodes.Callvirt,
                 emitterContext.Node.SetMethod);
         }
     }

@@ -256,5 +256,87 @@ namespace ILusion.Tests
 
             EmitAndValidateUnchanged(sampleMethod, syntaxTree);
         }
+
+        [Fact]
+        public void SetInstanceAutoPropertyStruct()
+        {
+            var sampleMethod = GetSampleMethod(nameof(PropertyAssignmentSamplesStruct), nameof(PropertyAssignmentSamplesStruct.SetInstanceAutoPropertyStruct));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x =>
+                {
+                    var propertyAssignment =
+                        CheckNode<PropertyAssignmentNode>(x,
+                            y => CheckNode<ThisReferenceNode>(y),
+                            y => CheckNode<LiteralNode>(y));
+
+                    Assert.Same(NthValueChild(x, 0), propertyAssignment.Instance);
+                    Assert.Same(NthValueChild(x, 1), propertyAssignment.Value);
+                    Assert.False(propertyAssignment.IsBaseCall);
+                    Assert.NotNull(propertyAssignment.Property);
+                    Assert.Equal("InstanceAutoProperty", propertyAssignment.Property.Name);
+                    Assert.Null(propertyAssignment.ConstrainedModifier);
+                    Assert.NotNull(propertyAssignment.SetMethod);
+                    Assert.Equal("set_InstanceAutoProperty", propertyAssignment.SetMethod.Name);
+                });
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+        [Fact]
+        public void SetInstanceAutoPropertyOnObject()
+        {
+            var sampleMethod = GetSampleMethod(nameof(PropertyAssignmentSamplesStruct), nameof(PropertyAssignmentSamplesStruct.SetInstanceAutoPropertyOnObject));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x =>
+                {
+                    var propertyAssignment =
+                        CheckNode<PropertyAssignmentNode>(x,
+                            y => CheckNode<ParameterNode>(y),
+                            y => CheckNode<LiteralNode>(y));
+
+                    Assert.Same(NthValueChild(x, 0), propertyAssignment.Instance);
+                    Assert.Same(NthValueChild(x, 1), propertyAssignment.Value);
+                    Assert.False(propertyAssignment.IsBaseCall);
+                    Assert.NotNull(propertyAssignment.Property);
+                    Assert.Equal("InstanceAutoProperty", propertyAssignment.Property.Name);
+                    Assert.Null(propertyAssignment.ConstrainedModifier);
+                    Assert.NotNull(propertyAssignment.SetMethod);
+                    Assert.Equal("set_InstanceAutoProperty", propertyAssignment.SetMethod.Name);
+                });
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
+        [Fact]
+        public void SetInstanceVirtualAutoPropertyOnObject()
+        {
+            var sampleMethod = GetSampleMethod(nameof(PropertyAssignmentSamplesStruct), nameof(PropertyAssignmentSamplesStruct.SetInstanceVirtualAutoPropertyOnObject));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x =>
+                {
+                    var propertyAssignment =
+                        CheckNode<PropertyAssignmentNode>(x,
+                            y => CheckNode<ParameterNode>(y),
+                            y => CheckNode<LiteralNode>(y));
+
+                    Assert.Same(NthValueChild(x, 0), propertyAssignment.Instance);
+                    Assert.Same(NthValueChild(x, 1), propertyAssignment.Value);
+                    Assert.False(propertyAssignment.IsBaseCall);
+                    Assert.NotNull(propertyAssignment.Property);
+                    Assert.Equal("InstanceVirtualAutoProperty", propertyAssignment.Property.Name);
+                    Assert.Null(propertyAssignment.ConstrainedModifier);
+                    Assert.NotNull(propertyAssignment.SetMethod);
+                    Assert.Equal("set_InstanceVirtualAutoProperty", propertyAssignment.SetMethod.Name);
+                });
+
+            EmitAndValidateUnchanged(sampleMethod, syntaxTree);
+        }
     }
 }
