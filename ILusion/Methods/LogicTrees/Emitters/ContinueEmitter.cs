@@ -1,7 +1,7 @@
-﻿using ILusion.Methods.LogicTrees.Helpers;
+﻿using ILusion.Exceptions;
+using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil.Cil;
-using System;
 using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Emitters
@@ -19,7 +19,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
 
             if (emitterContext.ContinueContext == null)
             {
-                throw new InvalidOperationException("Continue is only valid inside a loop statement.");
+                throw new EmissionException("Continue is only valid inside a loop statement.");
             }
 
             var targetNode =

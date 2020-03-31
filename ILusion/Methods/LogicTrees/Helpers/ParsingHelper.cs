@@ -22,7 +22,7 @@ namespace ILusion.Methods.LogicTrees.Helpers
             _parsers
                 .SelectMany(x => x.CanTryParse.Select(y => new KeyValuePair<OpCode, IParser>(y, x)))
                 .GroupBy(x => x.Key)
-                .ToDictionary(x => x.Key, x => x.Select(y => y.Value).ToArray());
+                .ToDictionary(x => x.Key, x => x.Select(y => y.Value).OrderBy(y => y.Order).ToArray());
 
         internal static ValueNode[] GetValueNodes(Stack<LogicNode> nodeStack, int count, out IReadOnlyList<LogicNode> nodes, bool popNodes = true)
         {
@@ -127,25 +127,26 @@ namespace ILusion.Methods.LogicTrees.Helpers
             }
         }
 
-        internal static ValueNode ParseConditionalNodeCondition(
+        internal static bool ParseConditionalNodeCondition(
             Stack<LogicNode> nodeStack,
+            out ValueNode condition,
             out VariableDefinition conditionResultVariable,
             out IReadOnlyList<LogicNode> nodes)
         {
-            // for While True loops - the syntax is a bit different
-            if (nodeStack.Peek() is VariableAssignmentNode variableAssignment
-                && variableAssignment.Value is LiteralNode literal
-                && true.Equals(literal.Value))
+            condition = null;
+            conditionResultVariable = null;
+            nodes = null;
+
+            try
             {
-                nodeStack.Pop();
-                conditionResultVariable = variableAssignment.Variable;
-                nodes = new[] { literal };
-                return literal;
+                condition = GetValueNodes(nodeStack, 1, out nodes)[0];
+            }
+            catch
+            {
+                return false;
             }
 
-            var condition = GetValueNodes(nodeStack, 1, out nodes)[0];
-            conditionResultVariable = null;
-
+            // setting then getting the same variable (a pattern used in conditionals)
             if (nodeStack.Peek() is VariableAssignmentNode variableAssignment2
                 && condition is VariableNode variable
                 && variableAssignment2.Variable == variable.Variable)
@@ -157,7 +158,7 @@ namespace ILusion.Methods.LogicTrees.Helpers
                 nodeStack.Pop();
             }
 
-            return condition;
+            return true;
         }
 
         internal static IReadOnlyList<LogicNode> HandleElseBlocks(IReadOnlyList<LogicNode> statements, Dictionary<Instruction, LogicNode> instructionToNodeMapping)
@@ -179,24 +180,24 @@ namespace ILusion.Methods.LogicTrees.Helpers
                 {
                     ifNode.TrueStatements = HandleElseBlocks(ifNode.TrueStatements, instructionToNodeMapping);
 
-                    if (ifNode.TrueStatements.LastOrDefault() is GoToNode goTo) 
-                    if (goTo.OriginalTarget.Offset > instructionToNodeMapping.First(x => x.Value == goTo).Key.Offset)
-                    if (goToTargetsSuggestingPresenceOfElse.Contains(goTo.OriginalTarget))
-                    {
-                        ifNode.TrueStatements = ImmutableArray.CreateRange(ifNode.TrueStatements.Take(ifNode.TrueStatements.Count - 1));
-                        var afterElseStatement = statements.First(x => instructionToNodeMapping.First(y => y.Value == NodeHelper.GetFirstRecursively(x)).Key == goTo.OriginalTarget);
-                        var elseStatements = new List<LogicNode>();
+                    if (ifNode.TrueStatements.LastOrDefault() is GoToNode goTo)
+                        if (goTo.OriginalTarget.Offset > instructionToNodeMapping.First(x => x.Value == goTo).Key.Offset)
+                            if (goToTargetsSuggestingPresenceOfElse.Contains(goTo.OriginalTarget))
+                            {
+                                ifNode.TrueStatements = ImmutableArray.CreateRange(ifNode.TrueStatements.Take(ifNode.TrueStatements.Count - 1));
+                                var afterElseStatement = statements.First(x => instructionToNodeMapping.First(y => y.Value == NodeHelper.GetFirstRecursively(x)).Key == goTo.OriginalTarget);
+                                var elseStatements = new List<LogicNode>();
 
-                        var j = i + 1;
+                                var j = i + 1;
 
-                        for (; statements[j] != afterElseStatement; j++)
-                        {
-                            elseStatements.Add(statements[j]);
-                        }
+                                for (; statements[j] != afterElseStatement; j++)
+                                {
+                                    elseStatements.Add(statements[j]);
+                                }
 
-                        i = j - 1;
-                        ifNode.FalseStatements = HandleElseBlocks(elseStatements, instructionToNodeMapping);
-                    }
+                                i = j - 1;
+                                ifNode.FalseStatements = HandleElseBlocks(elseStatements, instructionToNodeMapping);
+                            }
                 }
                 else if (statements[i] is LoopNode loop)
                 {

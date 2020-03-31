@@ -7,6 +7,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class ReferenceAssignmentParser : IParser
     {
+        public int Order => 0;
+
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Stobj,

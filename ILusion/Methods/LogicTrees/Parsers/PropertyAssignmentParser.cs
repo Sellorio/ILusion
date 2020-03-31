@@ -1,13 +1,15 @@
-﻿using System.Linq;
-using ILusion.Methods.LogicTrees.Helpers;
+﻿using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class PropertyAssignmentParser : IParser
     {
+        public int Order => 0;
+
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Callvirt,

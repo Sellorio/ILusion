@@ -1,6 +1,6 @@
-﻿using ILusion.Methods.LogicTrees.Nodes;
+﻿using ILusion.Exceptions;
+using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil.Cil;
-using System;
 using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Emitters
@@ -18,7 +18,7 @@ namespace ILusion.Methods.LogicTrees.Emitters
 
             if (emitterContext.ContinueContext == null)
             {
-                throw new InvalidOperationException("Break is only valid inside a loop or switch statement.");
+                throw new EmissionException("Break is only valid inside a loop or switch statement.");
             }
 
             var target = emitterContext.InstructionToNodeMapping.Last(x => x.Value == emitterContext.ContinueContext).Key.Next;

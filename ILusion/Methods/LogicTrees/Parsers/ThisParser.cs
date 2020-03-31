@@ -5,6 +5,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class ThisParser : IParser
     {
+        public int Order => 0;
+
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Ldarg_0

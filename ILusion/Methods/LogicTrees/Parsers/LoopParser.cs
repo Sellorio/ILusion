@@ -9,6 +9,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class LoopParser : IParser
     {
+        public int Order => 1;
+
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Brtrue,
@@ -27,7 +29,29 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 return false;
             }
 
-            var condition = ParsingHelper.ParseConditionalNodeCondition(parsingContext.NodeStack, out var conditionResultVariable, out var children);
+            var targetNode = parsingContext.InstructionToNodeMapping[targetInstruction];
+
+            ValueNode condition;
+            VariableDefinition conditionResultVariable;
+            IReadOnlyList<LogicNode> children;
+
+            if ((parsingContext.Instruction.OpCode == OpCodes.Br || parsingContext.Instruction.OpCode == OpCodes.Br_S)
+                && parsingContext.NodeStack.Peek() is VariableAssignmentNode variableAssignment
+                && variableAssignment.Value is LiteralNode literal
+                && true.Equals(literal.Value)
+                && parsingContext.NodeStack.Any(x => targetNode == NodeHelper.GetFirstRecursively(x)))
+            {
+                // infinite loop
+                condition = literal;
+                conditionResultVariable = variableAssignment.Variable;
+                children = variableAssignment.Children;
+                parsingContext.NodeStack.Pop();
+            }
+            else if (!ParsingHelper.ParseConditionalNodeCondition(parsingContext.NodeStack, out condition, out conditionResultVariable, out children))
+            {
+                return false;
+            }
+
             var firstConditionNode = NodeHelper.GetFirstRecursively(condition);
             var firstConditionInstruction = parsingContext.InstructionToNodeMapping.First(x => x.Value == firstConditionNode).Key;
             var statements = new List<LogicNode>();

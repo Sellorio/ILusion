@@ -1,11 +1,13 @@
-﻿using System;
-using ILusion.Methods.LogicTrees.Nodes;
+﻿using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil.Cil;
+using System;
 
 namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class LiteralParser : IParser
     {
+        public int Order => 0;
+
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Ldc_I4,

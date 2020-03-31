@@ -7,6 +7,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class ArrayLengthParser : IParser
     {
+        public int Order => 0;
+
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Ldlen

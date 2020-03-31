@@ -1,14 +1,16 @@
-﻿using System.Linq;
-using ILusion.Exceptions;
+﻿using ILusion.Exceptions;
 using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class InitializeParser : IParser
     {
+        public int Order => 0;
+
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Initobj,

@@ -1,12 +1,14 @@
-﻿using System.Linq;
-using ILusion.Methods.LogicTrees.Nodes;
+﻿using ILusion.Methods.LogicTrees.Nodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Linq;
 
 namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class ParameterParser : IParser
     {
+        public int Order => 0;
+
         private static readonly OpCode?[] _dereferenceOpCodes =
         {
             OpCodes.Ldind_I1,

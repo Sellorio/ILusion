@@ -7,6 +7,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class ConditionalOperatorParser : IParser
     {
+        public int Order => 1;
+
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Brtrue,

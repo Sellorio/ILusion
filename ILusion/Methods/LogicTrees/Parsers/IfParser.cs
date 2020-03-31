@@ -7,6 +7,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class IfParser : IParser
     {
+        public int Order => 1;
+
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Brfalse,
@@ -17,7 +19,10 @@ namespace ILusion.Methods.LogicTrees.Parsers
         {
             var targetInstruction = (Instruction)parsingContext.Instruction.Operand;
 
-            var condition = ParsingHelper.ParseConditionalNodeCondition(parsingContext.NodeStack, out var conditionResultVariable, out var children);
+            if (!ParsingHelper.ParseConditionalNodeCondition(parsingContext.NodeStack, out var condition, out var conditionResultVariable, out var children))
+            {
+                return false;
+            }
 
             var trueInstruction = parsingContext.Instruction.Next;
             var trueEndInstruction = targetInstruction;

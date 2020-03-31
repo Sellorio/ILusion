@@ -4,21 +4,21 @@ using Mono.Cecil.Cil;
 
 namespace ILusion.Methods.LogicTrees.Parsers
 {
-    internal class AddParser : IParser
+    internal class SubtractParser : IParser
     {
         public int Order => 0;
 
         public OpCode[] CanTryParse { get; } =
         {
-            OpCodes.Add,
-            OpCodes.Add_Ovf,
-            OpCodes.Add_Ovf_Un
+            OpCodes.Sub,
+            OpCodes.Sub_Ovf,
+            OpCodes.Sub_Ovf_Un
         };
 
         public bool TryParse(ParsingContext parsingContext)
         {
             var values = ParsingHelper.GetValueNodes(parsingContext.NodeStack, 2, out var children);
-            return parsingContext.Success(new AddNode(values[0], values[1], parsingContext.Instruction.OpCode != OpCodes.Add, children));
+            return parsingContext.Success(new SubtractNode(values[0], values[1], parsingContext.Instruction.OpCode != OpCodes.Sub, children));
         }
     }
 }

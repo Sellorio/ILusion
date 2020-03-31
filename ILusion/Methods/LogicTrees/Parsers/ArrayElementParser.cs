@@ -6,6 +6,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
 {
     internal class ArrayElementParser : IParser
     {
+        public int Order => 0;
+
         public OpCode[] CanTryParse { get; } =
         {
             OpCodes.Ldelem_Any,
