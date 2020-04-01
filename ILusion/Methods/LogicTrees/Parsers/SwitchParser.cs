@@ -50,7 +50,6 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 }
 
                 var value = ((VariableAssignmentNode)parsingContext.NodeStack.Peek()).Value;
-                var valueType = value.GetValueType();
                 var children = parsingContext.NodeStack.Peek().Children;
                 parsingContext.NodeStack.Pop();
 
@@ -62,11 +61,11 @@ namespace ILusion.Methods.LogicTrees.Parsers
                     instruction = instruction.Previous;
                 }
 
-                var temporaryVariable = (VariableDefinition)instruction.Operand;
+                var temporaryVariable = OpCodeHelper.GetLocal(parsingContext.Method, instruction);
 
                 instruction = instruction.Next; // skip assignment to temporary variable
 
-                while (TryParseClump(ref instruction, temporaryVariable, valueType, switchCaseHeaders))
+                while (TryParseClump(parsingContext.Method, ref instruction, temporaryVariable, switchCaseHeaders))
                 {
                     // keep trying to parse more clumps
                 }
@@ -98,15 +97,20 @@ namespace ILusion.Methods.LogicTrees.Parsers
             return false;
         }
 
-        private static bool TryParseClump(ref Instruction instruction, VariableDefinition temporaryVariable, TypeReference valueType, List<SwitchCaseHeader> switchCases)
+        private static bool TryParseClump(
+            MethodDefinition method,
+            ref Instruction instruction,
+            VariableDefinition temporaryVariable,
+            List<SwitchCaseHeader> switchCases)
         {
-            if (OpCodeHelper.LdlocOpCodes.Contains(instruction.OpCode) && instruction.Operand == temporaryVariable)
+            if (OpCodeHelper.LdlocOpCodes.Contains(instruction.OpCode)
+                && OpCodeHelper.GetLocal(method, instruction) == temporaryVariable)
             {
                 var currentInstruction = instruction.Next;
 
                 var result =
-                    _switchableTypes.Contains(valueType.FullName) && TryParseSwitchClump(ref currentInstruction, switchCases)
-                    || TryParseBranchClump(ref currentInstruction, valueType, switchCases);
+                    TryParseSwitchClump(ref currentInstruction, temporaryVariable.VariableType, switchCases)
+                    || TryParseBranchClump(ref currentInstruction, temporaryVariable.VariableType, switchCases);
 
                 if (result)
                 {
@@ -119,8 +123,15 @@ namespace ILusion.Methods.LogicTrees.Parsers
             return false;
         }
 
-        private static bool TryParseSwitchClump(ref Instruction instruction, List<SwitchCaseHeader> switchCases)
+        private static bool TryParseSwitchClump(ref Instruction instruction, TypeReference valueType, List<SwitchCaseHeader> switchCases)
         {
+            var resolvedValueType = valueType.Resolve();
+
+            if (!_switchableTypes.Contains(valueType.FullName) && resolvedValueType?.IsEnum != true)
+            {
+                return false;
+            }
+
             var offset = 0;
             var currentInstruction = instruction;
 
@@ -154,10 +165,17 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
             for (var i = 0; i < switchInstructions.Length; i++)
             {
+                var integerValue = offset + i;
+
+                object caseValue =
+                    resolvedValueType?.IsEnum != true
+                        ? (object)integerValue
+                        : resolvedValueType.Fields.First(x => integerValue.Equals(x.Constant));
+
                 switchCases.Add(new SwitchCaseHeader
                 {
                     BodyStartInstruction = switchInstructions[i],
-                    Value = offset + i
+                    Value = caseValue
                 });
             }
 
@@ -180,30 +198,57 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
         private static List<SwitchCase> ExpandSwitchCaseHeaders(ParsingContext parsingContext, List<SwitchCaseHeader> switchCaseHeaders, Instruction firstInstructionAfterSwitch)
         {
-            var result = new List<SwitchCase>(switchCaseHeaders.Count + 1);
+            var result = new SwitchCase[switchCaseHeaders.Count + 1];
 
             for (var i = 0; i < switchCaseHeaders.Count; i++)
             {
+                var value = switchCaseHeaders[i].Value;
+                var startInstruction = switchCaseHeaders[i].BodyStartInstruction;
+
                 var endInstruction =
                     i == switchCaseHeaders.Count - 1
                         ? firstInstructionAfterSwitch
-                        : switchCaseHeaders[i + 1].BodyStartInstruction;
+                        : switchCaseHeaders.Skip(i + 1).OrderBy(x => x.BodyStartInstruction.Offset).First().BodyStartInstruction;
+
+                // fake case (gaps produced by some Switch instructions and fallthrough to default)
+                if (startInstruction == firstInstructionAfterSwitch)
+                {
+                    continue;
+                }
+
+                // fallthrough to case
+                if (switchCaseHeaders.Skip(i + 1).Any(x => x.BodyStartInstruction == startInstruction))
+                {
+                    // will be replaced in next loop through - after all concrete SwitchCase items and SwitchDefaultCase have been added
+                    continue;
+                }
 
                 var switchCaseStatements =
-                    ParsingHelper.ParseBlock(parsingContext.Method, parsingContext.InstructionToNodeMapping, switchCaseHeaders[i].BodyStartInstruction, endInstruction)
+                    ParsingHelper.ParseBlock(parsingContext.Method, parsingContext.InstructionToNodeMapping, startInstruction, endInstruction)
                         .ToList();
 
-                if (switchCaseHeaders[i].Value == SwitchDefaultCase.CaseValue)
+                if (value == SwitchDefaultCase.CaseValue)
                 {
-                    result.Add(new SwitchDefaultCase(switchCaseStatements));
+                    result[i] = new SwitchDefaultCase(switchCaseStatements);
                 }
                 else
                 {
-                    result.Add(new SwitchCase(switchCaseHeaders[i].Value, switchCaseStatements));
+                    result[i] = new SwitchCase(value, switchCaseStatements);
                 }
             }
 
-            return result;
+            // handle fallthrough cases
+            for (var i = 0; i < switchCaseHeaders.Count; i++)
+            {
+                if (result[i] == null && switchCaseHeaders[i].BodyStartInstruction != firstInstructionAfterSwitch)
+                {
+                    var targetHeader = switchCaseHeaders.Last(x => x.BodyStartInstruction == switchCaseHeaders[i].BodyStartInstruction);
+                    var target = result[switchCaseHeaders.IndexOf(targetHeader)];
+                    result[i] = new SwitchFallthroughCase(switchCaseHeaders[i].Value, target);
+                }
+            }
+
+            return result.Where(x => x != null).ToList();
         }
 
         private static Instruction EvaluateProbableEndInstruction(

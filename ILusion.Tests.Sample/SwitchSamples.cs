@@ -214,6 +214,153 @@ namespace ILusion.Tests.Sample
             Console.WriteLine("Bongo");
         }
 
+        public static void OneSwitchClumpWithGap(int value)
+        {
+            switch (value)
+            {
+                case -2:
+                    Console.WriteLine("-2");
+                    break;
+                case -1:
+                    Console.WriteLine("-1");
+                    break;
+                case 2:
+                    Console.WriteLine("2");
+                    break;
+            }
+        }
+
+        public static void OneSwitchClumpWithGapAndDefault(int value)
+        {
+            switch (value)
+            {
+                case -2:
+                    Console.WriteLine("-2");
+                    break;
+                case -1:
+                    Console.WriteLine("-1");
+                    break;
+                case 2:
+                    Console.WriteLine("2");
+                    break;
+                default:
+                    Console.WriteLine("DefaultBody");
+                    break;
+            }
+
+            Console.WriteLine("After Switch");
+        }
+
+        public static void FallthroughFromCaseToCase(int value)
+        {
+            switch (value)
+            {
+                case 0:
+                    Console.WriteLine("0");
+                    break;
+                case 2:
+                    Console.WriteLine("2");
+                    break;
+                case 1:
+                case 3:
+                    Console.WriteLine("3");
+                    break;
+            }
+        }
+
+        public static void FallthroughFromCaseToDefault(int value)
+        {
+            switch (value)
+            {
+                case 0:
+                    Console.WriteLine("0");
+                    break;
+                case 1:
+                    Console.WriteLine("1");
+                    break;
+                case 2:
+                    Console.WriteLine("2");
+                    break;
+                case 3:
+                default:
+                    Console.WriteLine("DefaultBody");
+                    break;
+            }
+
+            Console.WriteLine("After Switch");
+        }
+
+        public static void TwoSwitchClumps(int value)
+        {
+            switch (value)
+            {
+                case -3:
+                    Console.WriteLine("-3");
+                    break;
+                case -2:
+                    Console.WriteLine("-2");
+                    break;
+                case -1:
+                    Console.WriteLine("-1");
+                    break;
+                case 6:
+                    Console.WriteLine("6");
+                    break;
+                case 7:
+                    Console.WriteLine("7");
+                    break;
+                case 8:
+                    Console.WriteLine("8");
+                    break;
+            }
+        }
+
+        public static void TwoSwitchClumpsWithDefault(int value)
+        {
+            switch (value)
+            {
+                case -3:
+                    Console.WriteLine("-3");
+                    break;
+                case -2:
+                    Console.WriteLine("-2");
+                    break;
+                case -1:
+                    Console.WriteLine("-1");
+                    break;
+                case 6:
+                    Console.WriteLine("6");
+                    break;
+                case 7:
+                    Console.WriteLine("7");
+                    break;
+                case 8:
+                    Console.WriteLine("8");
+                    break;
+                default:
+                    Console.WriteLine("DefaultBody");
+                    break;
+            }
+
+            Console.WriteLine("After Switch");
+        }
+
+        public static void EnumSwitchClump(Test value)
+        {
+            switch (value)
+            {
+                case Test.One:
+                    Console.WriteLine("Luv");
+                    break;
+                case Test.Two:
+                    Console.WriteLine("One");
+                    break;
+                case Test.Three:
+                    Console.WriteLine("Two");
+                    break;
+            }
+        }
+
         public enum Test
         {
             One,

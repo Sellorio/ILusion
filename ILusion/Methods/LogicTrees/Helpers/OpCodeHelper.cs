@@ -1,5 +1,7 @@
 ﻿using ILusion.Exceptions;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System;
 using System.Collections.Generic;
 
 namespace ILusion.Methods.LogicTrees.Helpers
@@ -31,6 +33,43 @@ namespace ILusion.Methods.LogicTrees.Helpers
             OpCodes.Ldc_I4_S,
             OpCodes.Ldc_I4
         };
+
+        internal static VariableDefinition GetLocal(MethodDefinition method, Instruction instruction)
+        {
+            int index;
+
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Ldloc:
+                case Code.Ldloc_S:
+                case Code.Ldloca:
+                case Code.Ldloca_S:
+                case Code.Stloc:
+                case Code.Stloc_S:
+                    index = ((VariableDefinition)instruction.Operand).Index;
+                    break;
+                case Code.Ldloc_0:
+                case Code.Stloc_0:
+                    index = 0;
+                    break;
+                case Code.Ldloc_1:
+                case Code.Stloc_1:
+                    index = 1;
+                    break;
+                case Code.Ldloc_2:
+                case Code.Stloc_2:
+                    index = 2;
+                    break;
+                case Code.Ldloc_3:
+                case Code.Stloc_3:
+                    index = 3;
+                    break;
+                default:
+                    throw new ArgumentException("The given instruction does not interact with locals.");
+            }
+
+            return method.Body.Variables[index];
+        }
 
         internal static OpCode LoadLocalOpCode(int index, out bool requiresParameter)
         {
