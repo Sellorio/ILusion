@@ -1618,6 +1618,254 @@ namespace ILusion.Tests
                         });
                 });
         }
+
+        [Fact]
+        public void FloatBranchClump()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.FloatBranchClump));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            Assert.Equal(0.0f, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("0.0f", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(1.0f, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("1.0f", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(2.0f, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("2.0f", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void DoubleBranchClump()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.DoubleBranchClump));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            Assert.Equal(0.0, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("0.0", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(1.0, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("1.0", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(2.0, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("2.0", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void DoubleBranchClumpWithFloatCases()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.DoubleBranchClumpWithFloatCases));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            Assert.Equal(0.0, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("0.0f", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(1.0, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("1.0f", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(2.0, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("2.0f", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(2.0, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("2.0f", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void FloatBranchClumpWithFallthrough()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.FloatBranchClumpWithFallthrough));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            Assert.Equal(0.0f, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("0.0f", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(2.0f, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("2.0f", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(1.0f, y.Value);
+                            var fallthrough = Assert.IsType<SwitchFallthroughCase>(y);
+                            Assert.Same(switchNode.Cases[3], fallthrough.Target);
+                            Assert.Empty(fallthrough.Statements);
+                        },
+                        y =>
+                        {
+                            Assert.Equal(3.0f, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("3.0f", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
     }
 
     // Uses switch when:

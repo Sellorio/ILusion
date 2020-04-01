@@ -208,7 +208,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 valueType.FullName == typeof(float).FullName ||
                 valueType.FullName == typeof(double).FullName)
             {
-                return false;
+                return TryParseFloatingPointBranchClump(ref instruction, switchCases);
             }
             else if (
                 valueType.FullName == typeof(byte).FullName ||
@@ -227,6 +227,19 @@ namespace ILusion.Methods.LogicTrees.Parsers
             {
                 return false; // type switch
             }
+        }
+
+        private static bool TryParseFloatingPointBranchClump(ref Instruction instruction, List<SwitchCaseHeader> switchCases)
+        {
+            if ((instruction.OpCode == OpCodes.Ldc_R4 || instruction.OpCode == OpCodes.Ldc_R8) &&
+                (instruction.Next.OpCode == OpCodes.Beq || instruction.Next.OpCode == OpCodes.Beq_S))
+            {
+                switchCases.Add(new SwitchCaseHeader { Value = instruction.Operand, BodyStartInstruction = (Instruction)instruction.Next.Operand });
+                instruction = instruction.Next.Next;
+                return true;
+            }
+
+            return false;
         }
 
         private static bool TryParseIntegerBranchClump(ref Instruction instruction, TypeReference valueType, List<SwitchCaseHeader> switchCases)
@@ -285,7 +298,8 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 instruction = instruction.Next;
                 return true;
             }
-            else if (OpCodeHelper.LdcI4OpCodes.Contains(instruction.OpCode) &&
+            else if (
+                OpCodeHelper.LdcI4OpCodes.Contains(instruction.OpCode) &&
                 (instruction.Next.OpCode == OpCodes.Beq || instruction.Next.OpCode == OpCodes.Beq_S))
             {
                 var integerValue = OpCodeHelper.GetInteger(instruction);

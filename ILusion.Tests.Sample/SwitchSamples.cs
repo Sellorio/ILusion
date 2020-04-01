@@ -447,6 +447,71 @@ namespace ILusion.Tests.Sample
             }
         }
 
+        public static void FloatBranchClump(float value)
+        {
+            switch (value)
+            {
+                case 0.0f:
+                    Console.WriteLine("0.0f");
+                    break;
+                case 1.0f:
+                    Console.WriteLine("1.0f");
+                    break;
+                case 2.0f:
+                    Console.WriteLine("2.0f");
+                    break;
+            }
+        }
+
+        public static void DoubleBranchClump(double value)
+        {
+            switch (value)
+            {
+                case 0.0:
+                    Console.WriteLine("0.0");
+                    break;
+                case 1.0:
+                    Console.WriteLine("1.0");
+                    break;
+                case 2.0:
+                    Console.WriteLine("2.0");
+                    break;
+            }
+        }
+
+        public static void DoubleBranchClumpWithFloatCases(double value)
+        {
+            switch (value)
+            {
+                case 0.0f:
+                    Console.WriteLine("0.0f");
+                    break;
+                case 1.0f:
+                    Console.WriteLine("1.0f");
+                    break;
+                case 2.0f:
+                    Console.WriteLine("2.0f");
+                    break;
+            }
+        }
+
+        public static void FloatBranchClumpWithFallthrough(float value)
+        {
+            switch (value)
+            {
+                case 0.0f:
+                    Console.WriteLine("0.0f");
+                    break;
+                case 2.0f:
+                    Console.WriteLine("2.0f");
+                    break;
+                case 1.0f:
+                case 3.0f:
+                    Console.WriteLine("3.0f");
+                    break;
+            }
+        }
+
         public enum Test
         {
             One,
