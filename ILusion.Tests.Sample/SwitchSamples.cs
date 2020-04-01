@@ -361,6 +361,92 @@ namespace ILusion.Tests.Sample
             }
         }
 
+        public static void IntegerBranchClumpsWithZeroClump(int value)
+        {
+            switch (value)
+            {
+                case 0:
+                    Console.WriteLine("0");
+                    break;
+                case 1:
+                    Console.WriteLine("1");
+                    break;
+            }
+        }
+
+        public static void OneIntegerBranchClump(int value)
+        {
+            switch (value)
+            {
+                case 1:
+                    Console.WriteLine("1");
+                    break;
+                case 2:
+                    Console.WriteLine("2");
+                    break;
+            }
+        }
+
+        public static void MultipleIntegerBranchClumps(int value)
+        {
+            switch (value)
+            {
+                case 0:
+                    Console.WriteLine("0");
+                    break;
+                case 1:
+                    Console.WriteLine("1");
+                    break;
+                case 6:
+                    Console.WriteLine("6");
+                    break;
+                case 7:
+                    Console.WriteLine("7");
+                    break;
+            }
+        }
+
+        public static void MultipleIntegerBranchClumpsWithDefault(int value)
+        {
+            switch (value)
+            {
+                case 0:
+                    Console.WriteLine("0");
+                    break;
+                case 1:
+                    Console.WriteLine("1");
+                    break;
+                case 6:
+                    Console.WriteLine("6");
+                    break;
+                case 7:
+                    Console.WriteLine("7");
+                    break;
+                default:
+                    Console.WriteLine("Default");
+                    break;
+            }
+        }
+
+        public static void MultipleEnumBranchClumps(Test value)
+        {
+            switch (value)
+            {
+                case Test.One:
+                    Console.WriteLine("0");
+                    break;
+                case Test.Two:
+                    Console.WriteLine("1");
+                    break;
+                case Test.Seven:
+                    Console.WriteLine("6");
+                    break;
+                case Test.Eight:
+                    Console.WriteLine("7");
+                    break;
+            }
+        }
+
         public enum Test
         {
             One,

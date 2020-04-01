@@ -35,8 +35,6 @@ namespace ILusion.Methods.LogicTrees.Parsers
             OpCodes.Brfalse_S,
             OpCodes.Bgt,
             OpCodes.Bgt_S,
-            OpCodes.Bgt_Un,
-            OpCodes.Bgt_Un_S,
             OpCodes.Switch
         };
 
@@ -115,6 +113,13 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 if (result)
                 {
                     instruction = currentInstruction;
+
+                    // clumps are separated by a branch to the next instruction
+                    if ((instruction.OpCode == OpCodes.Br || instruction.OpCode == OpCodes.Br_S) &&
+                        instruction.Operand == instruction.Next)
+                    {
+                        instruction = instruction.Next;
+                    }
                 }
 
                 return result;
@@ -193,6 +198,122 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
         private static bool TryParseBranchClump(ref Instruction instruction, TypeReference valueType, List<SwitchCaseHeader> switchCases)
         {
+            var valueTypeName = valueType.FullName;
+
+            if (valueType.FullName == typeof(decimal).FullName)
+            {
+                return false;
+            }
+            else if (
+                valueType.FullName == typeof(float).FullName ||
+                valueType.FullName == typeof(double).FullName)
+            {
+                return false;
+            }
+            else if (
+                valueType.FullName == typeof(byte).FullName ||
+                valueTypeName == typeof(sbyte).FullName ||
+                valueTypeName == typeof(short).FullName ||
+                valueTypeName == typeof(ushort).FullName ||
+                valueTypeName == typeof(int).FullName ||
+                valueTypeName == typeof(uint).FullName ||
+                valueTypeName == typeof(long).FullName ||
+                valueTypeName == typeof(ulong).FullName ||
+                valueType.Resolve()?.IsEnum == true)
+            {
+                return TryParseIntegerBranchClump(ref instruction, valueType, switchCases);
+            }
+            else
+            {
+                return false; // type switch
+            }
+        }
+
+        private static bool TryParseIntegerBranchClump(ref Instruction instruction, TypeReference valueType, List<SwitchCaseHeader> switchCases)
+        {
+            if (TryParseIntegerValueBranch(ref instruction, valueType, switchCases))
+            {
+                return true;
+            }
+            else if (
+                (OpCodeHelper.LdcI4OpCodes.Contains(instruction.OpCode) || instruction.OpCode == OpCodes.Ldc_I8) &&
+                (instruction.Next.OpCode == OpCodes.Bgt || instruction.Next.OpCode == OpCodes.Bgt_S))
+            {
+                var nextClumpInstruction = (Instruction)instruction.Next.Operand;
+                instruction = instruction.Next.Next.Next;
+
+                // parse the different values in this clump
+                while (TryParseIntegerValueBranch(ref instruction, valueType, switchCases))
+                {
+                    // clumps are separated by a branch to the next instruction
+                    if ((instruction.OpCode == OpCodes.Br || instruction.OpCode == OpCodes.Br_S) &&
+                        instruction.Operand == instruction.Next)
+                    {
+                        instruction = instruction.Next;
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    if (OpCodeHelper.LdlocOpCodes.Contains(instruction.OpCode))
+                    {
+                        instruction = instruction.Next;
+                    }
+                }
+
+                instruction = nextClumpInstruction;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool TryParseIntegerValueBranch(ref Instruction instruction, TypeReference valueType, List<SwitchCaseHeader> switchCases)
+        {
+            var resolvedValueType = valueType.Resolve();
+
+            // when testing against zero, Brfalse is used instead of Ldc+Beq
+            if (instruction.OpCode == OpCodes.Brfalse || instruction.OpCode == OpCodes.Brfalse_S)
+            {
+                object caseValue =
+                    resolvedValueType?.IsEnum != true
+                        ? (object)0
+                        : resolvedValueType.Fields.First(x => 0.Equals(x.Constant));
+
+                switchCases.Add(new SwitchCaseHeader { Value = caseValue, BodyStartInstruction = (Instruction)instruction.Operand });
+                instruction = instruction.Next;
+                return true;
+            }
+            else if (OpCodeHelper.LdcI4OpCodes.Contains(instruction.OpCode) &&
+                (instruction.Next.OpCode == OpCodes.Beq || instruction.Next.OpCode == OpCodes.Beq_S))
+            {
+                var integerValue = OpCodeHelper.GetInteger(instruction);
+                object caseValue =
+                    resolvedValueType?.IsEnum != true
+                        ? (object)integerValue
+                        : resolvedValueType.Fields.First(x => integerValue.Equals(x.Constant));
+
+                switchCases.Add(new SwitchCaseHeader { Value = caseValue, BodyStartInstruction = (Instruction)instruction.Next.Operand });
+                instruction = instruction.Next.Next;
+                return true;
+            }
+            else if (
+                instruction.OpCode == OpCodes.Ldc_I8 &&
+                (instruction.Next.OpCode == OpCodes.Beq || instruction.Next.OpCode == OpCodes.Beq_S))
+            {
+                var instructionCopy = instruction;
+
+                object caseValue =
+                    resolvedValueType?.IsEnum != true
+                        ? instruction.Operand
+                        : resolvedValueType.Fields.First(x => instructionCopy.Operand.Equals(x.Constant));
+
+                switchCases.Add(new SwitchCaseHeader { Value = caseValue, BodyStartInstruction = (Instruction)instruction.Next.Operand });
+                instruction = instruction.Next.Next;
+                return true;
+            }
+
             return false;
         }
 
@@ -349,6 +470,14 @@ namespace ILusion.Methods.LogicTrees.Parsers
             {
                 // this is used for integers (when not using switch opcode, floats and doubles)
                 instructionDepth = 3;
+                return true;
+            }
+            else if (
+                (instruction.OpCode == OpCodes.Brfalse || instruction.OpCode == OpCodes.Brfalse_S) &&
+                (instruction.Next.OpCode == OpCodes.Br || instruction.Next.OpCode == OpCodes.Br_S))
+            {
+                // integer branch mode with zero as the first case
+                instructionDepth = 2;
                 return true;
             }
             else if (
