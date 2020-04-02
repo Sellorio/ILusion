@@ -201,7 +201,11 @@ namespace ILusion.Methods.LogicTrees.Parsers
         {
             var valueTypeName = valueType.FullName;
 
-            if (valueType.FullName == typeof(decimal).FullName)
+            if (valueType.FullName == typeof(string).FullName)
+            {
+                return TryParseStringBranchClump(ref instruction, switchCases);
+            }
+            else if (valueType.FullName == typeof(decimal).FullName)
             {
                 return TryParseDecimalBranchClump(ref instruction, switchCases);
             }
@@ -228,6 +232,38 @@ namespace ILusion.Methods.LogicTrees.Parsers
             {
                 return false; // type switch
             }
+        }
+
+        private static bool TryParseStringBranchClump(ref Instruction instruction, List<SwitchCaseHeader> switchCases)
+        {
+            var value = instruction.Operand;
+
+            if (instruction.OpCode == OpCodes.Brfalse || instruction.OpCode == OpCodes.Brfalse_S)
+            {
+                switchCases.Add(new SwitchCaseHeader { Value = null, BodyStartInstruction = (Instruction)instruction.Operand });
+                instruction = instruction.Next;
+                return true;
+            }
+
+            instruction = instruction.Next;
+
+            if (instruction.OpCode != OpCodes.Call)
+            {
+                throw new ParsingException("Unable to parse string switch.");
+            }
+
+            instruction = instruction.Next;
+
+            if (instruction.OpCode != OpCodes.Brtrue && instruction.OpCode != OpCodes.Brtrue_S)
+            {
+                throw new ParsingException("Unable to parse string switch.");
+            }
+
+            switchCases.Add(new SwitchCaseHeader { Value = value, BodyStartInstruction = (Instruction)instruction.Operand });
+
+            instruction = instruction.Next;
+
+            return true;
         }
 
         private static bool TryParseDecimalBranchClump(ref Instruction instruction, List<SwitchCaseHeader> switchCases)
@@ -602,21 +638,13 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
         private static bool IsStringBranch(Instruction instruction, out int instructionDepth)
         {
-            instructionDepth = 4;
+            instructionDepth = 2;
 
             return
-                (instruction.OpCode == OpCodes.Brtrue || instruction.OpCode == OpCodes.Brtrue_S) &&
-                instruction.Previous.OpCode == OpCodes.Call &&
-                ((MethodReference)instruction.Previous.Operand).Name == "op_Equality" &&
-                ((MethodReference)instruction.Previous.Operand).DeclaringType.FullName == "System.String" &&
-                instruction.Previous.Previous.OpCode == OpCodes.Ldstr &&
-                OpCodeHelper.LdlocOpCodes.Contains(instruction.Previous.Previous.Previous.OpCode) &&
-                OpCodeHelper.LdlocOpCodes.Contains(instruction.Next.OpCode) &&
-                instruction.Next.Operand == instruction.Previous.Previous.Previous.Operand &&
-                instruction.Next.Next.OpCode == OpCodes.Ldstr &&
-                instruction.Next.Next.Next.OpCode == OpCodes.Call &&
-                ((MethodReference)instruction.Next.Next.Next.Operand) == instruction.Previous.Operand &&
-                (instruction.Next.Next.Next.Next.OpCode == OpCodes.Brtrue || instruction.Next.Next.Next.Next.OpCode == OpCodes.Brtrue_S);
+                OpCodeHelper.LdlocOpCodes.Contains(instruction.Previous.OpCode) &&
+                instruction.Previous.OpCode == instruction.Next.OpCode &&
+                instruction.Previous.Operand == instruction.Next.Operand &&
+                instruction.Next.Next.OpCode == OpCodes.Ldstr;
         }
 
         private static void HandleBreakAndGoToCase(

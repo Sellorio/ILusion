@@ -534,6 +534,77 @@ namespace ILusion.Tests.Sample
             }
         }
 
+        public static void StringBranchClump(string value)
+        {
+            switch (value)
+            {
+                case "Zero":
+                    Console.WriteLine("0");
+                    break;
+                case "One":
+                    Console.WriteLine("1");
+                    break;
+                case "Two":
+                    Console.WriteLine("2");
+                    break;
+            }
+        }
+
+        public static void StringBranchClumpWithDefault(string value)
+        {
+            switch (value)
+            {
+                case "Zero":
+                    Console.WriteLine("0");
+                    break;
+                case "One":
+                    Console.WriteLine("1");
+                    break;
+                case "Two":
+                    Console.WriteLine("2");
+                    break;
+                default:
+                    Console.WriteLine("Default");
+                    break;
+            }
+        }
+
+        public static void StringBranchClumpWithNull(string value)
+        {
+            switch (value)
+            {
+                case null:
+                    Console.WriteLine("null");
+                    break;
+                case "Zero":
+                    Console.WriteLine("0");
+                    break;
+                case "One":
+                    Console.WriteLine("1");
+                    break;
+                case "Two":
+                    Console.WriteLine("2");
+                    break;
+            }
+        }
+
+        public static void StringBranchClumpWithNullFallthrough(string value)
+        {
+            switch (value)
+            {
+                case null:
+                case "Zero":
+                    Console.WriteLine("0");
+                    break;
+                case "One":
+                    Console.WriteLine("1");
+                    break;
+                case "Two":
+                    Console.WriteLine("2");
+                    break;
+            }
+        }
+
         public enum Test
         {
             One,
