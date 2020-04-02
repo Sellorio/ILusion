@@ -2203,6 +2203,701 @@ namespace ILusion.Tests
                         });
                 });
         }
+
+        [Fact]
+        public void TypeBranchClump()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.TypeBranchClump));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.String", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Exception", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("class without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Byte", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Int32", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("value without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void TypeBranchClumpWithNoVariables()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.TypeBranchClumpWithNoVariables));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.String", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("string", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Exception", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("Exception", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Int32", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("int", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void TypeBranchClumpWithValueTypeFirst()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.TypeBranchClumpWithValueTypeFirst));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Byte", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Int32", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("value without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.String", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Exception", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("class without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void TypeBranchClumpWithValueTypeFirstAndNoVariables()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.TypeBranchClumpWithValueTypeFirstAndNoVariables));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Int32", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("int", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.String", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("string", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Exception", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("Exception", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void TypeBranchClumpWithDefault()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.TypeBranchClumpWithDefault));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.String", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Exception", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("class without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Byte", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Int32", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("value without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchDefaultCase>(y);
+                            Assert.Equal(SwitchDefaultCase.CaseValue, typeCase.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("Default", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void TypeBranchClumpWithGeneric()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.TypeBranchClumpWithGeneric));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.String", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Exception", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("class without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("T", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("generic", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void TypeBranchClumpWithGenericAndVariable()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.TypeBranchClumpWithGenericAndVariable));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.String", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Exception", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("class without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("T", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<CastNode>(a,
+                                        b => CheckNode<VariableNode>(b))),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void TypeBranchClumpWithClassGeneric()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.TypeBranchClumpWithClassGeneric));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.String", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Exception", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("class without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("T", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("generic", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void TypeBranchClumpWithClassGenericAndVariable()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.TypeBranchClumpWithClassGenericAndVariable));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.String", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Exception", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("class without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("T", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<CastNode>(a,
+                                        b => CheckNode<VariableNode>(b))),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void TypeBranchClumpWithStructGeneric()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.TypeBranchClumpWithStructGeneric));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.String", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Exception", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("class without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("T", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("generic", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void TypeBranchClumpWithStructGenericAndVariable()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.TypeBranchClumpWithStructGenericAndVariable));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.String", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<VariableNode>(a)),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("System.Exception", typeCase.Value.FullName);
+                            Assert.Null(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("class without variable", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            var typeCase = Assert.IsType<SwitchTypeCase>(y);
+                            Assert.Equal("T", typeCase.Value.FullName);
+                            Assert.NotNull(typeCase.Variable);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a => CheckNode<CastNode>(a,
+                                        b => CheckNode<VariableNode>(b))),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
     }
 
     // Uses switch when:

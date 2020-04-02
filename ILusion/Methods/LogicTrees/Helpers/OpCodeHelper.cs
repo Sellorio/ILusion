@@ -18,6 +18,16 @@ namespace ILusion.Methods.LogicTrees.Helpers
             OpCodes.Ldloc_S
         };
 
+        internal static readonly HashSet<OpCode> StlocOpCodes = new HashSet<OpCode>
+        {
+            OpCodes.Stloc,
+            OpCodes.Stloc_0,
+            OpCodes.Stloc_1,
+            OpCodes.Stloc_2,
+            OpCodes.Stloc_3,
+            OpCodes.Stloc_S
+        };
+
         internal static readonly HashSet<OpCode> LdcI4OpCodes = new HashSet<OpCode>
         {
             OpCodes.Ldc_I4_M1,

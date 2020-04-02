@@ -605,6 +605,198 @@ namespace ILusion.Tests.Sample
             }
         }
 
+        public static void TypeBranchClump(object value)
+        {
+            switch (value)
+            {
+                case string str:
+                    Console.WriteLine(str);
+                    break;
+                case Exception _:
+                    Console.WriteLine("class without variable");
+                    break;
+                case byte by:
+                    Console.WriteLine(by);
+                    break;
+                case int _:
+                    Console.WriteLine("value without variable");
+                    break;
+            }
+        }
+
+        public static void TypeBranchClumpWithNoVariables(object value)
+        {
+            switch (value)
+            {
+                case string _:
+                    Console.WriteLine("string");
+                    break;
+                case Exception _:
+                    Console.WriteLine("Exception");
+                    break;
+                case int _:
+                    Console.WriteLine("int");
+                    break;
+            }
+        }
+
+        public static void TypeBranchClumpWithValueTypeFirst(object value)
+        {
+            switch (value)
+            {
+                case byte by:
+                    Console.WriteLine(by);
+                    break;
+                case int _:
+                    Console.WriteLine("value without variable");
+                    break;
+                case string str:
+                    Console.WriteLine(str);
+                    break;
+                case Exception _:
+                    Console.WriteLine("class without variable");
+                    break;
+            }
+        }
+
+        public static void TypeBranchClumpWithValueTypeFirstAndNoVariables(object value)
+        {
+            switch (value)
+            {
+                case int _:
+                    Console.WriteLine("int");
+                    break;
+                case string _:
+                    Console.WriteLine("string");
+                    break;
+                case Exception _:
+                    Console.WriteLine("Exception");
+                    break;
+            }
+        }
+
+        public static void TypeBranchClumpWithDefault(object value)
+        {
+            switch (value)
+            {
+                case string str:                // class with variable
+                    Console.WriteLine(str);
+                    break;
+                case Exception _:               // class without variable
+                    Console.WriteLine("class without variable");
+                    break;
+                case byte by:
+                    Console.WriteLine(by);
+                    break;
+                case int _:                     // value without variable
+                    Console.WriteLine("value without variable");
+                    break;
+                default:
+                    Console.WriteLine("Default");
+                    break;
+            }
+        }
+
+        public static void TypeBranchClumpWithGeneric<T>(object value)
+        {
+            switch (value)
+            {
+                case string str:
+                    Console.WriteLine(str);
+                    break;
+                case Exception _:
+                    Console.WriteLine("class without variable");
+                    break;
+                case T _:
+                    Console.WriteLine("generic");
+                    break;
+            }
+        }
+
+        public static void TypeBranchClumpWithGenericAndVariable<T>(object value)
+        {
+            switch (value)
+            {
+                case string str:
+                    Console.WriteLine(str);
+                    break;
+                case Exception _:
+                    Console.WriteLine("class without variable");
+                    break;
+                case T rick:
+                    Console.WriteLine(rick);
+                    break;
+            }
+        }
+
+        public static void TypeBranchClumpWithClassGeneric<T>(object value)
+            where T : class
+        {
+            switch (value)
+            {
+                case string str:
+                    Console.WriteLine(str);
+                    break;
+                case Exception _:
+                    Console.WriteLine("class without variable");
+                    break;
+                case T _:
+                    Console.WriteLine("generic");
+                    break;
+            }
+        }
+
+        public static void TypeBranchClumpWithClassGenericAndVariable<T>(object value)
+            where T : class
+        {
+            switch (value)
+            {
+                case string str:
+                    Console.WriteLine(str);
+                    break;
+                case Exception _:
+                    Console.WriteLine("class without variable");
+                    break;
+                case T rick:
+                    Console.WriteLine(rick);
+                    break;
+            }
+        }
+
+        public static void TypeBranchClumpWithStructGeneric<T>(object value)
+            where T : struct
+        {
+            switch (value)
+            {
+                case string str:
+                    Console.WriteLine(str);
+                    break;
+                case Exception _:
+                    Console.WriteLine("class without variable");
+                    break;
+                case T _:
+                    Console.WriteLine("generic");
+                    break;
+            }
+        }
+
+        public static void TypeBranchClumpWithStructGenericAndVariable<T>(object value)
+            where T : struct
+        {
+            switch (value)
+            {
+                case string str:
+                    Console.WriteLine(str);
+                    break;
+                case Exception _:
+                    Console.WriteLine("class without variable");
+                    break;
+                case T rick:
+                    Console.WriteLine(rick);
+                    break;
+            }
+        }
+
         public enum Test
         {
             One,

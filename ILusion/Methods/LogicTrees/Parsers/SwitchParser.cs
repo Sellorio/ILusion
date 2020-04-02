@@ -41,7 +41,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
         public bool TryParse(ParsingContext parsingContext)
         {
-            if (IsAtSwitch(parsingContext.Instruction, out var instructionDepth))
+            if (IsAtSwitch(parsingContext.Method, parsingContext.Instruction, out var instructionDepth))
             {
                 while (!(parsingContext.NodeStack.Peek() is VariableAssignmentNode))
                 {
@@ -109,7 +109,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
                 var result =
                     TryParseSwitchClump(ref currentInstruction, temporaryVariable.VariableType, switchCases)
-                    || TryParseBranchClump(ref currentInstruction, temporaryVariable.VariableType, switchCases);
+                    || TryParseBranchClump(method, ref currentInstruction, temporaryVariable.VariableType, switchCases);
 
                 if (result)
                 {
@@ -119,7 +119,19 @@ namespace ILusion.Methods.LogicTrees.Parsers
                     if ((instruction.OpCode == OpCodes.Br || instruction.OpCode == OpCodes.Br_S) &&
                         instruction.Operand == instruction.Next)
                     {
-                        instruction = instruction.Next;
+                        var instructionCopy = instruction;
+                        // when the last case of a type switch is a struct or generic with variable, there is no br to end/default so we need to look up for the last brfalse
+                        if (switchCases.Any(x => x.BodyStartInstruction == instructionCopy))
+                        {
+                            while (instruction.OpCode != OpCodes.Brfalse && instruction.OpCode != OpCodes.Brfalse_S)
+                            {
+                                instruction = instruction.Previous;
+                            }
+                        }
+                        else
+                        {
+                            instruction = instruction.Next;
+                        }
                     }
                 }
 
@@ -197,7 +209,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
             return true;
         }
 
-        private static bool TryParseBranchClump(ref Instruction instruction, TypeReference valueType, List<SwitchCaseHeader> switchCases)
+        private static bool TryParseBranchClump(MethodDefinition method, ref Instruction instruction, TypeReference valueType, List<SwitchCaseHeader> switchCases)
         {
             var valueTypeName = valueType.FullName;
 
@@ -230,7 +242,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
             }
             else
             {
-                return false; // type switch
+                return TryParseTypeBranchClump(method, ref instruction, switchCases); // type switch
             }
         }
 
@@ -417,6 +429,59 @@ namespace ILusion.Methods.LogicTrees.Parsers
             return false;
         }
 
+        private static bool TryParseTypeBranchClump(MethodDefinition method, ref Instruction instruction, List<SwitchCaseHeader> switchCases)
+        {
+            var targetType = (TypeReference)instruction.Operand;
+
+            instruction = instruction.Next;
+
+            if (instruction.OpCode == OpCodes.Brfalse || instruction.OpCode == OpCodes.Brfalse_S)
+            {
+                // when a value type case with a variable are used, the result of isinst is checked, then then the value is unboxed
+                instruction = instruction.Next.Next.Next;
+                var variable = OpCodeHelper.GetLocal(method, instruction);
+                instruction = instruction.Next;
+
+                switchCases.Add(new SwitchCaseHeader { BodyStartInstruction = (Instruction)instruction.Operand, Value = targetType, Variable = variable });
+
+                instruction = instruction.Next;
+
+                return true;
+            }
+            else
+            {
+                // generic class with variable will unbox
+                if (instruction.OpCode == OpCodes.Unbox_Any)
+                {
+                    instruction = instruction.Next;
+                }
+
+                var variable =
+                    OpCodeHelper.StlocOpCodes.Contains(instruction.OpCode)
+                        ? OpCodeHelper.GetLocal(method, instruction)
+                        : null;
+
+                instruction = variable == null ? instruction : instruction.Next.Next;
+
+                // generic class with variable will box the value again for the brtrue check
+                if (instruction.OpCode == OpCodes.Box)
+                {
+                    instruction = instruction.Next;
+                }
+
+                if (instruction.OpCode != OpCodes.Brtrue && instruction.OpCode != OpCodes.Brtrue_S)
+                {
+                    throw new ParsingException("Unable to parse type switch.");
+                }
+
+                switchCases.Add(new SwitchCaseHeader { Value = targetType, Variable = variable, BodyStartInstruction = (Instruction)instruction.Operand });
+
+                instruction = instruction.Next;
+            }
+
+            return true;
+        }
+
         private static List<SwitchCase> ExpandSwitchCaseHeaders(ParsingContext parsingContext, List<SwitchCaseHeader> switchCaseHeaders, Instruction firstInstructionAfterSwitch)
         {
             var result = new SwitchCase[switchCaseHeaders.Count + 1];
@@ -444,6 +509,12 @@ namespace ILusion.Methods.LogicTrees.Parsers
                     continue;
                 }
 
+                // type switches with a variable branch to an unconditional branch which points to the next instruction
+                if (value is TypeReference && switchCaseHeaders[i].Variable != null)
+                {
+                    startInstruction = startInstruction.Next;
+                }
+
                 var switchCaseStatements =
                     ParsingHelper.ParseBlock(parsingContext.Method, parsingContext.InstructionToNodeMapping, startInstruction, endInstruction)
                         .ToList();
@@ -451,6 +522,10 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 if (value == SwitchDefaultCase.CaseValue)
                 {
                     result[i] = new SwitchDefaultCase(switchCaseStatements);
+                }
+                else if (value is TypeReference typeReference)
+                {
+                    result[i] = new SwitchTypeCase(typeReference, switchCaseHeaders[i].Variable, switchCaseStatements);
                 }
                 else
                 {
@@ -538,10 +613,11 @@ namespace ILusion.Methods.LogicTrees.Parsers
         /// <summary>
         /// Checks whether or not the current location is actually a switch staetment and not something simpler.
         /// </summary>
+        /// <param name="method">The method being parsed.</param>
         /// <param name="instruction">The current instruction being parsed.</param>
         /// <param name="instructionDepth">How far into the switch statement the current instruction is. This is used to backtrack when parsing switches.</param>
         /// <returns>The result of the check.</returns>
-        private static bool IsAtSwitch(Instruction instruction, out int instructionDepth)
+        private static bool IsAtSwitch(MethodDefinition method, Instruction instruction, out int instructionDepth)
         {
             if (instruction.OpCode == OpCodes.Switch)
             {
@@ -582,13 +658,14 @@ namespace ILusion.Methods.LogicTrees.Parsers
             }
             else if (
                 IsDecimalBranch(instruction, out instructionDepth) ||
-                IsStringBranch(instruction, out instructionDepth))
+                IsStringBranch(instruction, out instructionDepth) ||
+                IsTypeBranch(method, instruction, out instructionDepth))
             {
                 return true;
             }
             else
             {
-                return false; // Type branches not implemented yet.
+                return false;
             }
         }
 
@@ -645,6 +722,31 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 instruction.Previous.OpCode == instruction.Next.OpCode &&
                 instruction.Previous.Operand == instruction.Next.Operand &&
                 instruction.Next.Next.OpCode == OpCodes.Ldstr;
+        }
+
+        private static bool IsTypeBranch(MethodDefinition method, Instruction instruction, out int instructionDepth)
+        {
+            var isTypeSwitchWithVariableDefinedForFirstTypeCheck =
+                OpCodeHelper.LdlocOpCodes.Contains(instruction.Previous.OpCode) &&
+                OpCodeHelper.StlocOpCodes.Contains(instruction.Previous.Previous.OpCode) &&
+                OpCodeHelper.GetLocal(method, instruction.Previous) == OpCodeHelper.GetLocal(method, instruction.Previous.Previous) &&
+                instruction.Previous.Previous.Previous.OpCode == OpCodes.Isinst &&
+                instruction.Previous.Previous.Previous.Previous.OpCode == instruction.Next.OpCode &&
+                instruction.Previous.Previous.Previous.Previous.Operand == instruction.Next.Operand;
+
+            if (isTypeSwitchWithVariableDefinedForFirstTypeCheck)
+            {
+                instructionDepth = 5;
+                return true;
+            }
+
+            var isTypeSwitchWithoutVariableDefinedForFirstTypeCheck =
+                instruction.Previous.OpCode == OpCodes.Isinst &&
+                instruction.Previous.Previous.OpCode == instruction.Next.OpCode &&
+                instruction.Previous.Previous.Operand == instruction.Next.Operand;
+
+            instructionDepth = 3;
+            return isTypeSwitchWithoutVariableDefinedForFirstTypeCheck;
         }
 
         private static void HandleBreakAndGoToCase(
