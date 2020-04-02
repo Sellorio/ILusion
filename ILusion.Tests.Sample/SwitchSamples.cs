@@ -512,6 +512,28 @@ namespace ILusion.Tests.Sample
             }
         }
 
+        public static void DecimalBranchClump(decimal value)
+        {
+            switch (value)
+            {
+                case -2:
+                    Console.WriteLine("-2");
+                    break;
+                case -1.1M:
+                    Console.WriteLine("-1.1M");
+                    break;
+                case 0.0M:
+                    Console.WriteLine("0.0M");
+                    break;
+                case 1.1M:
+                    Console.WriteLine("1.1M");
+                    break;
+                case 3:
+                    Console.WriteLine("3");
+                    break;
+            }
+        }
+
         public enum Test
         {
             One,

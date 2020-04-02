@@ -1,4 +1,5 @@
-﻿using ILusion.Methods.LogicTrees.Helpers;
+﻿using ILusion.Exceptions;
+using ILusion.Methods.LogicTrees.Helpers;
 using ILusion.Methods.LogicTrees.Nodes;
 using ILusion.Methods.LogicTrees.Parsers.Data;
 using Mono.Cecil;
@@ -202,7 +203,7 @@ namespace ILusion.Methods.LogicTrees.Parsers
 
             if (valueType.FullName == typeof(decimal).FullName)
             {
-                return false;
+                return TryParseDecimalBranchClump(ref instruction, switchCases);
             }
             else if (
                 valueType.FullName == typeof(float).FullName ||
@@ -227,6 +228,55 @@ namespace ILusion.Methods.LogicTrees.Parsers
             {
                 return false; // type switch
             }
+        }
+
+        private static bool TryParseDecimalBranchClump(ref Instruction instruction, List<SwitchCaseHeader> switchCases)
+        {
+            var decimalConstructorParameters = new List<int>();
+
+            while (OpCodeHelper.LdcI4OpCodes.Contains(instruction.OpCode))
+            {
+                decimalConstructorParameters.Add(OpCodeHelper.GetInteger(instruction));
+                instruction = instruction.Next;
+            }
+
+            var value = decimalConstructorParameters.Count switch
+            {
+                1 => new decimal(decimalConstructorParameters[0]),
+                5 =>
+                    new decimal(
+                        decimalConstructorParameters[0],
+                        decimalConstructorParameters[1],
+                        decimalConstructorParameters[2],
+                        decimalConstructorParameters[3] == 1,
+                        (byte)decimalConstructorParameters[4]),
+                _ => throw new ParsingException("Unable to parse decimal literal in switch.")
+            };
+
+            if (instruction.OpCode != OpCodes.Newobj)
+            {
+                throw new ParsingException("Unable to parse decimal switch.");
+            }
+
+            instruction = instruction.Next;
+
+            if (instruction.OpCode != OpCodes.Call)
+            {
+                throw new ParsingException("Unable to parse decimal switch.");
+            }
+
+            instruction = instruction.Next;
+
+            if (instruction.OpCode != OpCodes.Brtrue && instruction.OpCode != OpCodes.Brtrue_S)
+            {
+                throw new ParsingException("Unable to parse decimal switch.");
+            }
+
+            switchCases.Add(new SwitchCaseHeader { Value = value, BodyStartInstruction = (Instruction)instruction.Operand });
+
+            instruction = instruction.Next;
+
+            return true;
         }
 
         private static bool TryParseFloatingPointBranchClump(ref Instruction instruction, List<SwitchCaseHeader> switchCases)
@@ -513,30 +563,30 @@ namespace ILusion.Methods.LogicTrees.Parsers
                 instruction.Previous.OpCode == OpCodes.Call &&
                 ((MethodReference)instruction.Previous.Operand).Name == "op_Equality" &&
                 ((MethodReference)instruction.Previous.Operand).DeclaringType.FullName == "System.Decimal" &&
-                instruction.Previous.Previous.OpCode == OpCodes.Call &&
-                ((MethodReference)instruction.Previous.Previous.Operand).DeclaringType.FullName == "System.Decimal" &&
-                ((MethodReference)instruction.Previous.Previous.Operand).ReturnType.FullName == "System.Decimal";
+                instruction.Previous.Previous.OpCode == OpCodes.Newobj &&
+                ((MethodReference)instruction.Previous.Previous.Operand).DeclaringType.FullName == "System.Decimal";
 
-            if (currentInstructionAppearsToBeDecimalBranch &&
-                OpCodeHelper.LdlocOpCodes.Contains(instruction.Next.OpCode) &&
-                instruction.Next.Operand == instruction.Previous.Previous.Previous.Operand)
+            if (currentInstructionAppearsToBeDecimalBranch && OpCodeHelper.LdlocOpCodes.Contains(instruction.Next.OpCode))
             {
                 var currentInstruction = instruction.Next.Next;
 
-                while (currentInstruction.OpCode.ToString().StartsWith("Ldc_I4"))
+                while (OpCodeHelper.LdcI4OpCodes.Contains(currentInstruction.OpCode))
                 {
                     currentInstruction = currentInstruction.Next;
                 }
 
-                if (currentInstruction.OpCode == OpCodes.Call &&
-                    ((MethodReference)currentInstruction.Operand).DeclaringType.FullName == "System.Decimal" &&
-                    ((MethodReference)currentInstruction.Operand).ReturnType.FullName == "System.Decimal" &&
-                    (currentInstruction.Next.OpCode == OpCodes.Brtrue || currentInstruction.Next.OpCode == OpCodes.Brtrue_S))
+                if (currentInstruction.OpCode == OpCodes.Newobj &&
+                    ((MethodReference)currentInstruction.Operand).DeclaringType.FullName == typeof(decimal).FullName &&
+                    currentInstruction.Next.OpCode == OpCodes.Call &&
+                    ((MethodReference)currentInstruction.Next.Operand).Name == "op_Equality" &&
+                    ((MethodReference)currentInstruction.Next.Operand).DeclaringType.FullName == "System.Decimal" &&
+                    (currentInstruction.Next.Next.OpCode == OpCodes.Brtrue || currentInstruction.Next.Next.OpCode == OpCodes.Brtrue_S))
                 {
-                    instructionDepth = 3;
-                    currentInstruction = instruction.Previous.Previous;
+                    instructionDepth = 4;
 
-                    while (currentInstruction.OpCode.ToString().StartsWith("Ldc_I4"))
+                    currentInstruction = instruction.Previous.Previous.Previous;
+
+                    while (OpCodeHelper.LdcI4OpCodes.Contains(currentInstruction.OpCode))
                     {
                         currentInstruction = currentInstruction.Previous;
                         instructionDepth++;

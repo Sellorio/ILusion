@@ -313,7 +313,7 @@ namespace ILusion.Tests
         [Fact]
         public void OneSwitchClumpWithReturnsAndDefault()
         {
-            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.OneSwitchClumpWithReturnsAndBreaks));
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.OneSwitchClumpWithReturnsAndDefault));
             var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
 
             CheckStatements(
@@ -342,7 +342,12 @@ namespace ILusion.Tests
                             Assert.Equal(1, y.Value);
                             CheckStatements(
                                 y.Statements,
-                                z => CheckNode<BreakNode>(z));
+                                z => CheckNode<ReturnNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("One", literal.Value);
+                                    }));
                         },
                         y =>
                         {
@@ -361,7 +366,7 @@ namespace ILusion.Tests
                     y =>
                     {
                         var literal = CheckNode<LiteralNode>(y);
-                        Assert.Equal("Fallback", literal.Value);
+                        Assert.Equal("Default", literal.Value);
                     }));
         }
 
@@ -1786,19 +1791,6 @@ namespace ILusion.Tests
                                         Assert.Equal("2.0f", literal.Value);
                                     }),
                                 z => CheckNode<BreakNode>(z));
-                        },
-                        y =>
-                        {
-                            Assert.Equal(2.0, y.Value);
-                            CheckStatements(
-                                y.Statements,
-                                z => CheckNode<ActionCallNode>(z,
-                                    a =>
-                                    {
-                                        var literal = CheckNode<LiteralNode>(a);
-                                        Assert.Equal("2.0f", literal.Value);
-                                    }),
-                                z => CheckNode<BreakNode>(z));
                         });
                 });
         }
@@ -1861,6 +1853,89 @@ namespace ILusion.Tests
                                     {
                                         var literal = CheckNode<LiteralNode>(a);
                                         Assert.Equal("3.0f", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        });
+                });
+        }
+
+        [Fact]
+        public void DecimalBranchClump()
+        {
+            var sampleMethod = GetSampleMethod(nameof(SwitchSamples), nameof(SwitchSamples.DecimalBranchClump));
+            var syntaxTree = SyntaxTree.FromMethodDefinition(sampleMethod);
+
+            CheckStatements(
+                syntaxTree,
+                x => CheckNode<VariableAssignmentNode>(x, y => CheckNode<ParameterNode>(y)),
+                x =>
+                {
+                    var switchNode = CheckNode<SwitchNode>(x, y => CheckNode<VariableNode>(y));
+
+                    Assert.Collection(
+                        switchNode.Cases,
+                        y =>
+                        {
+                            Assert.Equal(-2M, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("-2", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(-1.1M, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("-1.1M", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(0.0M, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("0.0M", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(1.1M, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("1.1M", literal.Value);
+                                    }),
+                                z => CheckNode<BreakNode>(z));
+                        },
+                        y =>
+                        {
+                            Assert.Equal(3M, y.Value);
+                            CheckStatements(
+                                y.Statements,
+                                z => CheckNode<ActionCallNode>(z,
+                                    a =>
+                                    {
+                                        var literal = CheckNode<LiteralNode>(a);
+                                        Assert.Equal("3", literal.Value);
                                     }),
                                 z => CheckNode<BreakNode>(z));
                         });
